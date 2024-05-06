@@ -1,0 +1,4 @@
+enum Scope{
+  student,
+  course,
+}
