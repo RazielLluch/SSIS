@@ -27,7 +27,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   void _search(String query) {
     searchingController.searchResult(searchHandler.searchItem(query, searchScope!));
-
     setState(() {
       print("searching \"$query\" in $searchScope");
     });

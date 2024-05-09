@@ -7,14 +7,23 @@ class SearchingController extends ChangeNotifier{
 
   SearchHandler searchHandler = SearchHandler();
   
-  late Future<List<List<dynamic>>> _searchResults = searchHandler.searchItem("", Scope.student);
+  late List<List<dynamic>> _searchResults;
 
-  Future<List<List<dynamic>>> getSearchResults(){
+  SearchingController(){
+    initialize();
+  }
+
+  Future<void> initialize() async {
+    _searchResults = await searchHandler.searchItem("", Scope.student);
+    notifyListeners();
+  }
+
+  Future<List<List<dynamic>>> getSearchResults() async{
     return _searchResults;
   }
 
-  void searchResult(Future<List<List<dynamic>>> value){
-    _searchResults = value;
+  void searchResult(Future<List<List<dynamic>>> value) async{
+    _searchResults = await value;
 
     print("printing from search_controller $_searchResults");
     notifyListeners();
