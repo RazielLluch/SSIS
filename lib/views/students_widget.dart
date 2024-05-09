@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:new_ssis_2/controllers/search_controller.dart';
 import 'package:new_ssis_2/repository/student_repo.dart';
+import 'package:provider/provider.dart';
 
 class StudentsWidget extends StatefulWidget {
 
@@ -14,48 +16,56 @@ class _StudentsWidgetState extends State<StudentsWidget> {
   StudentRepo sRepo = StudentRepo();
 
   @override
+  void initState(){
+    SearchingController searchingController = context.read<SearchingController>();
+    super.initState();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
 
-    Future<List<List>> repoData = sRepo.getList();
+    final SearchingController searchingController1 = context.watch<SearchingController>();
 
-    return Container(
-      height: 500,
-      width: 772.5,
-      margin: const EdgeInsets.only(
-        top: 15,
-        right: 7,
-        bottom: 15,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 1.2,
-          color: Colors.white,
-          style: BorderStyle.solid,
-        ),
-        borderRadius: const BorderRadius.all(Radius.circular(15)),
-      ),
-      child: Column(
-        children: [
-          tableHeader(),
-          FutureBuilder(
-              future: repoData,
-              builder: (context, snapshot){
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
+    print("new state");
 
-                  snapshot!.data!.removeAt(0);
-
-                  return tableElements(snapshot.data!);
-                }
-              }
-          )
-        ],
-      ),
-    );
+        Future<List<List>> repoData = searchingController1.getSearchResults();
+        return Container(
+          height: 500,
+          margin: const EdgeInsets.only(
+            top: 15,
+            right: 7,
+            bottom: 15,
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1.2,
+              color: Colors.white,
+              style: BorderStyle.solid,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(15)),
+          ),
+          child: Column(
+            children: [
+              tableHeader(),
+              FutureBuilder(
+                future: repoData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    snapshot.data!.removeAt(0);
+                    return tableElements(snapshot.data!);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
   }
+
 
   Container tableHeader(){
     return Container(
@@ -84,7 +94,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                 )
             ),
             Container(
-                width: 300,
+                width: 298,
                 padding: const EdgeInsets.only(right: 5),
                 margin: const EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(

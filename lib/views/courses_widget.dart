@@ -1,15 +1,9 @@
-import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:csv/csv.dart';
-import 'dart:async' show Future;
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:new_ssis_2/repository/student_repo.dart';
 
 class CoursesWidget extends StatefulWidget {
 
-  CoursesWidget({super.key});
+  const CoursesWidget({super.key});
 
   @override
   _CoursesWidgetState createState() => _CoursesWidgetState();
