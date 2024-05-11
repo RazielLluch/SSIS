@@ -26,7 +26,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   }
 
   void _search(String query) {
-    searchingController.searchResult(searchHandler.searchItem(query, searchScope!));
+    searchingController.searchResult(searchHandler.searchItem(query, searchScope!), searchScope!);
     setState(() {
       print("searching \"$query\" in $searchScope");
     });
@@ -138,11 +138,17 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               color: Colors.grey.shade800,
             ), // X button to clear the search input field
             onPressed: () {
-              setState(() {
-                _searchController.clear();
 
-                _search(searchQuery);
-              });
+              _searchController.clear();
+              searchQuery = _searchController.text;
+              _search(searchQuery);
+
+
+              // setState(() {
+              //   _searchController.clear();
+              //
+              //   _search(searchQuery);
+              // });
             },
           ), // Reset search button
         ],

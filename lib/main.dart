@@ -21,7 +21,7 @@ void main() {
 
   doWhenWindowReady(() {
     final window = appWindow;
-    const initialSize = Size(1280, 720);
+    const initialSize = Size(1321, 720);
     window.minSize = initialSize;
     window.maxSize = initialSize;
     window.size = initialSize;
@@ -105,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 width: 1,
                                 color: Colors.grey,
                               ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
                             ),
                             child: const SearchBarWidget()
                           ),
