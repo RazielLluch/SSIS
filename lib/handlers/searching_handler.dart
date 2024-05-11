@@ -5,9 +5,9 @@ import 'package:new_ssis_2/repository/student_repo.dart';
 class SearchHandler{
   SearchHandler();
 
-  Future<List<dynamic>> searchItem(var query, Scope scope)async{
+  Future<List<List<dynamic>>> searchItem(var query, Scope scope)async{
 
-    List<int> validSearches = [];
+    List<List> validSearches = [];
     List<List> rawSearches;
     if(scope == Scope.course){
       CourseRepo cRepo = CourseRepo();
@@ -23,7 +23,8 @@ class SearchHandler{
       List temp = rawSearches[i];
       for(var val in temp){
         if(val.toString().toLowerCase().trim().contains(query.toLowerCase())){
-          validSearches.add(i);
+          validSearches.add(temp);
+          break;
         }
       }
     }

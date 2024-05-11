@@ -79,7 +79,7 @@ class FileHandler{
 
   Future<String> listToCsv(List<List> listToConvert) async{
     csv.ListToCsvConverter c = const csv.ListToCsvConverter();
-    return await c.convert(listToConvert, fieldDelimiter: ','); //default field delimiter is ','
+    return c.convert(listToConvert, fieldDelimiter: ','); //default field delimiter is ','
   }
 
   Future<List<List>> csvToList(File myCsvFile)async{
@@ -88,7 +88,7 @@ class FileHandler{
     const csv.CsvToListConverter(eol: "\r\n", fieldDelimiter: ",");
 
     // print('converting csv to list: ${myCsvFile.readAsStringSync()}');
-    return await c.convert(myCsvFile.readAsStringSync());
+    return c.convert(myCsvFile.readAsStringSync());
   }
 }
 

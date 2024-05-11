@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:new_ssis_2/controllers/search_controller.dart';
+import 'package:new_ssis_2/handlers/searching_handler.dart';
 import 'package:new_ssis_2/misc/scope.dart';
+import 'package:provider/provider.dart';
 
 class SearchBarWidget extends StatefulWidget {
   const SearchBarWidget({super.key});
@@ -13,7 +16,17 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   Scope? searchScope;
   String searchQuery = "";
 
-  void _search(String query){
+  SearchHandler searchHandler = SearchHandler();
+  late SearchingController searchingController;
+
+  @override
+  void initState() {
+    searchingController = context.read<SearchingController>(); // Initialize the controller
+    super.initState();
+  }
+
+  void _search(String query) {
+    searchingController.searchResult(searchHandler.searchItem(query, searchScope!), searchScope!);
     setState(() {
       print("searching \"$query\" in $searchScope");
     });
@@ -125,11 +138,17 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               color: Colors.grey.shade800,
             ), // X button to clear the search input field
             onPressed: () {
-              setState(() {
-                _searchController.clear();
 
-                _search(searchQuery);
-              });
+              _searchController.clear();
+              searchQuery = _searchController.text;
+              _search(searchQuery);
+
+
+              // setState(() {
+              //   _searchController.clear();
+              //
+              //   _search(searchQuery);
+              // });
             },
           ), // Reset search button
         ],

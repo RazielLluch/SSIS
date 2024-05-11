@@ -1,19 +1,27 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:new_ssis_2/views/searchbar_widget.dart';
 import 'package:new_ssis_2/views/students_widget.dart';
 import 'package:new_ssis_2/views/courses_widget.dart';
-// import 'package:new_ssis_2/views/students_widget.dart';
+import 'package:provider/provider.dart';
+import 'controllers/search_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+
+  // runApp(
+  //     ChangeNotifierProvider(
+  //       create: (_) => SearchingController(),
+  //       child: const MyApp(),
+  //     )
+  // );
+
+  runApp(MyApp());
+
   doWhenWindowReady(() {
     final window = appWindow;
-    const initialSize = Size(1280, 720);
+    const initialSize = Size(1321, 720);
     window.minSize = initialSize;
     window.maxSize = initialSize;
     window.size = initialSize;
@@ -85,29 +93,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   child: Align(
                     alignment: FractionalOffset.topCenter,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // SEARCH_BAR_WIDGET
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: Colors.grey,
+                    child: ChangeNotifierProvider(
+                      create: (_) => SearchingController(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // SEARCH_BAR_WIDGET
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: Colors.grey,
+                              ),
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
                             ),
-                            borderRadius: const BorderRadius.all(Radius.circular(15)),
+                            child: const SearchBarWidget()
                           ),
-                          child: const SearchBarWidget()
-                        ),
-                        // STUDENT AND COURSES WIDGETS
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const StudentsWidget(),
-                            CoursesWidget(),
-                          ]
-                        )
-                      ],
+                          // STUDENT AND COURSES WIDGETS
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              StudentsWidget(),
+                              CoursesWidget(),
+                            ]
+                          )
+                        ],
+                      ),
                     )
                   )
                 )
