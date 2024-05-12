@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../controllers/search_controller.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
@@ -25,11 +27,20 @@ class _EditButton extends State<EditButton>{
 
   late StudentRepo sRepo;
   late Future<List<List>> data;
+  late SearchingController searchingController;
+  late SearchHandler searchHandler;
 
   final sCourseController = TextEditingController();
   late dynamic _dropdownValue;
 
   List<TextEditingController>  controllers = [];
+
+  @override
+  void initState() {
+    searchHandler = SearchHandler();
+    searchingController = context.read<SearchingController>(); // Initialize the controller
+    super.initState();
+  }
 
   void initControllers(){
     int length;
@@ -69,13 +80,13 @@ class _EditButton extends State<EditButton>{
   void _editInfo(List data)async{
     if(widget.scope == Scope.student){
       sRepo = StudentRepo();
-      sRepo.editCsv(widget.index, data);
+      sRepo.editCsv(widget.index+1, data);
     }
     else{
 
       SearchHandler searchHandler = SearchHandler();
       List courseCodes = await cRepo.listPrimaryKeys();
-      String courseCode = courseCodes[widget.index];
+      String courseCode = courseCodes[widget.index+1];
 
       List enrolledStudents = await searchHandler.searchItem(courseCode, Scope.student);
 
@@ -86,13 +97,12 @@ class _EditButton extends State<EditButton>{
         sRepo.editCsv(enrolledStudents[i], currentData);
       }
 
-      cRepo.editCsv(widget.index, data);
+      cRepo.editCsv(widget.index+1, data);
     }
 
     print(data);
 
-    setState((){
-    });
+    searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
   }
 
   //this function is only used in the scope of a student
@@ -212,6 +222,7 @@ class _EditButton extends State<EditButton>{
 
                 _editInfo(data);
                 _resetControllers();
+
                 Navigator.pop(context);
                 widget.callback();
               },

@@ -34,6 +34,15 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+
+    print("new searchbar state");
+
+    if(searchScope != null){
+      _search(searchQuery);
+    }else{
+      searchingController.initialize();
+    }
+
     return Container(
       height: 40,
       padding: const EdgeInsets.all(8.0),

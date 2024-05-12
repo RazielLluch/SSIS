@@ -5,10 +5,13 @@ import 'package:new_ssis_2/views/delete_button.dart';
 import 'package:provider/provider.dart';
 
 import '../misc/scope.dart';
+import 'add_button.dart';
+import 'edit_button.dart';
 
 class StudentsWidget extends StatefulWidget {
+  final VoidCallback callback;
 
-  const StudentsWidget({super.key});
+  const StudentsWidget({super.key, required this.callback});
 
   @override
   _StudentsWidgetState createState() => _StudentsWidgetState();
@@ -19,6 +22,12 @@ class _StudentsWidgetState extends State<StudentsWidget> {
   late List<List> tempData;
 
   int _selectedIndex = -1;
+
+  void callback(){
+    setState(() {
+      widget.callback;
+    });
+  }
 
   void _handleRowTap(int index) {
     setState(() {
@@ -59,30 +68,50 @@ class _StudentsWidgetState extends State<StudentsWidget> {
         ),
         borderRadius: const BorderRadius.all(Radius.circular(15)),
       ),
-      child: Column(
-        children: [
-          tableHeader(),
-          FutureBuilder(
-            future: repoData,
-            builder: (context, snapshot) {
+      child: FutureBuilder(
+        future: repoData,
+        builder: (context, snapshot){
+          tempData = snapshot.data!;
 
-              tempData = snapshot.data!;
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Column(
+              children: [
+                tableHeader(),
+                tableElements(tempData),
+                Container(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: [
+                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
+                        EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
+                        AddButton(callback: callback)
+                      ],
+                    )
+                )
+              ],
+            );
+          } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            return Column(
+              children: [
+                tableHeader(),
+                tableElements(snapshot.data!),
+                Container(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: [
+                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
+                        EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
+                        AddButton(callback: callback)
+                      ],
+                    )
+                )
+              ],
+            );
+          }
+        },
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return tableElements(tempData);
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return tableElements(snapshot.data!);
-              }
-              },
-          ),
-          Row(
-            children: [
-
-            ]
-          )
-        ],
       ),
     );
   }
@@ -202,13 +231,15 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     if(data.isEmpty) {
       return ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.6667, // Adjust the value as needed
+          minHeight: MediaQuery.of(context).size.height * 0.5845,
+          maxHeight: MediaQuery.of(context).size.height * 0.5845, // Adjust the value as needed
         ),
       );
     }
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.6667, // Adjust the value as needed
+        minHeight: MediaQuery.of(context).size.height * 0.5845,
+        maxHeight: MediaQuery.of(context).size.height * 0.5845, // Adjust the value as needed
       ),
       child: SingleChildScrollView(
       scrollDirection: Axis.vertical,

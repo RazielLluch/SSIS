@@ -110,11 +110,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: const SearchBarWidget()
                           ),
                           // STUDENT AND COURSES WIDGETS
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              StudentsWidget(),
-                              CoursesWidget(),
+                              StudentsWidget(callback: callback),
+                              CoursesWidget(callback: callback),
                             ]
                           )
                         ],
