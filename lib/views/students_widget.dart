@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
-import 'package:new_ssis_2/repository/student_repo.dart';
 import 'package:new_ssis_2/views/delete_button.dart';
 import 'package:provider/provider.dart';
 

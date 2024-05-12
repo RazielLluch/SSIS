@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
-import 'package:new_ssis_2/repository/student_repo.dart';
 import 'package:provider/provider.dart';
 
 import '../misc/scope.dart';
@@ -150,8 +149,6 @@ class _CoursesWidgetState extends State<CoursesWidget> {
             double hPadding = 20;
             double vPadding = 5;
             double inset = 5;
-
-            Color rowColor = Colors.white;
 
             return GestureDetector(
               onTap: (){

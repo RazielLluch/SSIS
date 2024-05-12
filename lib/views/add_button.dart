@@ -73,7 +73,7 @@ class _AddButton extends State<AddButton>{
                   return DropdownMenuItem(
                     value: value,
                     child: Container(
-                        padding: EdgeInsets.only(left: 10),
+                        padding: const EdgeInsets.only(left: 10),
                         child: Text(value)
                     ),
                   );

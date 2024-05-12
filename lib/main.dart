@@ -17,7 +17,7 @@ void main() {
   //     )
   // );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 
   doWhenWindowReady(() {
     final window = appWindow;
@@ -90,36 +90,34 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: FractionalOffset.topCenter,
             child: Column(
               children: <Widget>[
-                Container(
-                  child: Align(
-                    alignment: FractionalOffset.topCenter,
-                    child: ChangeNotifierProvider(
-                      create: (_) => SearchingController(),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // SEARCH_BAR_WIDGET
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 1,
-                                color: Colors.grey,
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                Align(
+                  alignment: FractionalOffset.topCenter,
+                  child: ChangeNotifierProvider(
+                    create: (_) => SearchingController(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // SEARCH_BAR_WIDGET
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey,
                             ),
-                            child: const SearchBarWidget()
+                            borderRadius: const BorderRadius.all(Radius.circular(20)),
                           ),
-                          // STUDENT AND COURSES WIDGETS
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              StudentsWidget(callback: callback),
-                              CoursesWidget(callback: callback),
-                            ]
-                          )
-                        ],
-                      ),
-                    )
+                          child: const SearchBarWidget()
+                        ),
+                        // STUDENT AND COURSES WIDGETS
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            StudentsWidget(callback: callback),
+                            CoursesWidget(callback: callback),
+                          ]
+                        )
+                      ],
+                    ),
                   )
                 )
               ]

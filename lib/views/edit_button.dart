@@ -45,8 +45,11 @@ class _EditButton extends State<EditButton>{
   void initControllers(){
     int length;
 
-    if(widget.scope == Scope.student) length = 4;
-    else length = 2;
+    if(widget.scope == Scope.student) {
+      length = 4;
+    } else {
+      length = 2;
+    }
 
     for(int i = 0; i < length; i++){
       controllers.add(TextEditingController());
@@ -58,8 +61,11 @@ class _EditButton extends State<EditButton>{
   void _setControllers(){
     int length;
 
-    if(widget.scope == Scope.student) length = 4;
-    else length = 2;
+    if(widget.scope == Scope.student) {
+      length = 4;
+    } else {
+      length = 2;
+    }
 
     for(int i = 0; i < length; i++){
       controllers[i].text = widget.data[widget.index][i].toString();
@@ -69,8 +75,11 @@ class _EditButton extends State<EditButton>{
   void _resetControllers(){
     int length;
 
-    if(widget.scope == Scope.student) length = 4;
-    else length = 2;
+    if(widget.scope == Scope.student) {
+      length = 4;
+    } else {
+      length = 2;
+    }
 
     for(int i = 0; i < length; i++){
       controllers[i].clear();
@@ -126,13 +135,13 @@ class _EditButton extends State<EditButton>{
           return const Center(child: Text('No data available'));
         } else {
 
-          List _dropdownItems = snapshot.data!;
+          List dropdownItems = snapshot.data!;
           _dropdownValue = snapshot.data![0];
 
           return Expanded(
               child: DropdownButton(
                 value: _dropdownValue,
-                items: _dropdownItems.map((dynamic value) {
+                items: dropdownItems.map((dynamic value) {
                   return DropdownMenuItem(
                     value: value,
                     child: Container(
@@ -170,8 +179,11 @@ class _EditButton extends State<EditButton>{
       )
     ];
     int length;
-    if(widget.scope == Scope.student) length = 4;
-    else length = 2;
+    if(widget.scope == Scope.student) {
+      length = 4;
+    } else {
+      length = 2;
+    }
 
     for(int i = 0; i < length; i++){
       dialogElements.add(
