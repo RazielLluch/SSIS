@@ -3,6 +3,9 @@ import 'package:new_ssis_2/controllers/search_controller.dart';
 import 'package:provider/provider.dart';
 
 import '../misc/scope.dart';
+import 'add_button.dart';
+import 'delete_button.dart';
+import 'edit_button.dart';
 
 class CoursesWidget extends StatefulWidget {
   final VoidCallback callback;
@@ -21,7 +24,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
   void callback(){
     setState(() {
-      widget.callback;
+      widget.callback();
     });
   }
 
@@ -53,25 +56,49 @@ class _CoursesWidgetState extends State<CoursesWidget> {
         top: 15,
         bottom: 15,
       ),
-      child: Column(
-        children: [
-          tableHeader(),
-          FutureBuilder(
-            future: repoData,
-            builder: (context, snapshot) {
+      child: FutureBuilder(
+        future: repoData,
+        builder: (context, snapshot){
+          tempData = snapshot.data!;
 
-              tempData = snapshot.data!;
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return tableElements(tempData);
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return tableElements(snapshot.data!);
-              }
-            },
-          ),
-        ],
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return Column(
+              children: [
+                tableHeader(),
+                tableElements(tempData),
+                Container(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: [
+                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
+                        EditButton(data: tempData, index: _selectedIndex, callback: callback, scope: Scope.student),
+                        AddButton(callback: callback, scope: Scope.course)
+                      ],
+                    )
+                )
+              ],
+            );
+          }else if(snapshot.hasError){
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }else{
+            return Column(
+              children: [
+                tableHeader(),
+                tableElements(snapshot.data!),
+                Container(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: [
+                        DeleteButton(index: _selectedIndex, scope: Scope.course, callback: callback),
+                        EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.course),
+                        AddButton(callback: callback, scope: Scope.course)
+                      ],
+                    )
+                )
+              ],
+            );
+          }
+        },
       ),
     );
   }
@@ -175,7 +202,6 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                           ),
                           child: Container(
                             padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            alignment: Alignment.center,
                             child: Text(
                                 data[index][0].toString()
                             ),

@@ -14,9 +14,12 @@ class SearchingController extends ChangeNotifier{
     initialize();
   }
 
-  Future<void> initialize() async {
+  void initialize() async {
     _studentSearchResults = await searchHandler.searchItem("", Scope.student);
+    print("notifying students");
+    notifyListeners();
     _courseSearchResults = await searchHandler.searchItem("", Scope.course);
+    print("notifying courses");
     notifyListeners();
   }
 
@@ -28,7 +31,7 @@ class SearchingController extends ChangeNotifier{
     }
   }
 
-  void searchResult(Future<List<List<dynamic>>> value, Scope scope) async{
+  Future<void> searchResult(Future<List<List<dynamic>>> value, Scope scope) async{
 
     if(scope == Scope.student){
       _studentSearchResults = await value;

@@ -60,7 +60,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   void callback(){
+    print("main callback");
     setState(() {
+      print("main callback 2");
       print("parent widget refreshed");
     });
   }

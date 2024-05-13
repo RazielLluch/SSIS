@@ -42,6 +42,11 @@ class _EditButton extends State<EditButton>{
     super.initState();
   }
 
+  void callback(){
+    print("edit callback");
+    widget.callback();
+  }
+
   void initControllers(){
     int length;
 
@@ -89,7 +94,11 @@ class _EditButton extends State<EditButton>{
   void _editInfo(List data)async{
     if(widget.scope == Scope.student){
       sRepo = StudentRepo();
-      sRepo.editCsv(widget.index+1, data);
+      if(data[4] == "CourseCode"){
+        data[4] = "Not enrolled";
+      }
+      await sRepo.editCsv(widget.index+1, data);
+      searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
     }
     else{
 
@@ -107,11 +116,10 @@ class _EditButton extends State<EditButton>{
       }
 
       cRepo.editCsv(widget.index+1, data);
+      searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
     }
 
     print(data);
-
-    searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
   }
 
   //this function is only used in the scope of a student
@@ -136,17 +144,35 @@ class _EditButton extends State<EditButton>{
         } else {
 
           List dropdownItems = snapshot.data!;
-          _dropdownValue = snapshot.data![0];
+
+          print(snapshot.data!);
+
+          if(widget.data[widget.index][4] == null || widget.data[widget.index][4].toString() == "Not enrolled" || widget.data[widget.index][4].toString().isEmpty){
+            _dropdownValue = snapshot.data![0];
+          }else{
+            _dropdownValue = widget.data[widget.index][4];
+          }
+
+          print(_dropdownValue);
 
           return Expanded(
               child: DropdownButton(
                 value: _dropdownValue,
                 items: dropdownItems.map((dynamic value) {
+
+                  String value2;
+
+                  if(value == "CourseCode"){
+                    value2 = "Not enrolled";
+                  }else{
+                    value2 = value;
+                  }
+
                   return DropdownMenuItem(
                     value: value,
                     child: Container(
                         padding: const EdgeInsets.only(left: 10),
-                        child: Text(value)
+                        child: Text(value2)
                     ),
                   );
                 }).toList(),
@@ -235,8 +261,9 @@ class _EditButton extends State<EditButton>{
                 _editInfo(data);
                 _resetControllers();
 
+                callback();
                 Navigator.pop(context);
-                widget.callback();
+
               },
             )
         )

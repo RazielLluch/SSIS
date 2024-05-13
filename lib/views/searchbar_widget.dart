@@ -14,19 +14,21 @@ class SearchBarWidget extends StatefulWidget {
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   final TextEditingController _searchController = TextEditingController();
   Scope? searchScope;
-  String searchQuery = "";
+  late String searchQuery;
 
   SearchHandler searchHandler = SearchHandler();
   late SearchingController searchingController;
 
   @override
-  void initState() {
+  void initState(){
+    searchQuery = _searchController.text;
     searchingController = context.read<SearchingController>(); // Initialize the controller
+    searchingController.initialize();
     super.initState();
   }
 
-  void _search(String query) {
-    searchingController.searchResult(searchHandler.searchItem(query, searchScope!), searchScope!);
+  void _search(String query) async{
+    await searchingController.searchResult(searchHandler.searchItem(query, searchScope!), searchScope!);
     setState(() {
       print("searching \"$query\" in $searchScope");
     });
@@ -37,10 +39,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
     print("new searchbar state");
 
+    searchQuery = _searchController.text;
+    print("search query is currently $searchQuery");
+
+
     if(searchScope != null){
       _search(searchQuery);
     }else{
-      searchingController.initialize();
+      // searchingController.initialize();
     }
 
     return Container(
@@ -50,7 +56,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         children: <Widget>[ // Search icon
           const SizedBox(width: 8.0),
           Tooltip(
-            message: 'select student',
+            message: 'search student',
             child: ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.resolveWith<Color>(
@@ -86,7 +92,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
           ),
           const SizedBox(width: 8.0),
           Tooltip(
-            message: 'select course',
+            message: 'search course',
             child:ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.resolveWith<Color>(
@@ -150,7 +156,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
               _searchController.clear();
               searchQuery = _searchController.text;
+              searchScope = Scope.student;
               _search(searchQuery);
+              searchScope = Scope.course;
+              _search(searchQuery);
+              searchScope = null;
 
 
               // setState(() {

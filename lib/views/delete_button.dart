@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:new_ssis_2/controllers/search_controller.dart';
+import 'package:provider/provider.dart';
 
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
@@ -22,18 +24,33 @@ class _DeleteButton extends State<DeleteButton>{
   CourseRepo cRepo = CourseRepo();
 
   late StudentRepo sRepo = StudentRepo();
+  late SearchHandler searchHandler;
+  late SearchingController searchingController;
 
+  @override
+  void initState() {
+    searchHandler = SearchHandler();
+    searchingController = context.read<SearchingController>(); // Initialize the controller
+    super.initState();
+  }
+
+  void callback(){
+    print("add callback");
+    widget.callback();
+  }
 
   void _deleteInfo()async{
 
     if(widget.scope == Scope.student){
-      sRepo.deleteCsv(widget.index);
+      await sRepo.deleteCsv(widget.index+1);
     }else{
       SearchHandler searchHandler = SearchHandler();
       List courseCodes = await cRepo.listPrimaryKeys();
-      String courseCode = courseCodes[widget.index];
+      String courseCode = courseCodes[widget.index+1];
 
-      List enrolledStudents = await searchHandler.searchItem(courseCode, Scope.student);
+      print("selected course code: $courseCode");
+
+      List enrolledStudents = await searchHandler.searchItemIndexes(courseCode, Scope.student);
 
       for(int i = 0; i < enrolledStudents.length; i++){
         List<List> editList = await sRepo.getList();
@@ -42,15 +59,11 @@ class _DeleteButton extends State<DeleteButton>{
         sRepo.editCsv(enrolledStudents[i], currentData);
       }
 
-      cRepo.deleteCsv(widget.index);
+      await cRepo.deleteCsv(widget.index+1);
 
     }
 
-
-
-
-    setState((){
-    });
+    searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
   }
 
   @override
@@ -109,7 +122,7 @@ class _DeleteButton extends State<DeleteButton>{
                                       onPressed: (){
                                         _deleteInfo();
                                         Navigator.pop(context);
-                                        widget.callback();
+                                        callback();
                                       },
                                     )
                                 )

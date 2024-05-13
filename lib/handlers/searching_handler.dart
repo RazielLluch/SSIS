@@ -35,6 +35,35 @@ class SearchHandler{
     return validSearches;
   }
 
+  Future<List<int>> searchItemIndexes(var query, Scope scope) async{
+    List<int> validSearches = [];
+    List<List> rawSearches;
+    if(scope == Scope.course){
+      CourseRepo cRepo = CourseRepo();
+      rawSearches = await cRepo.getList();
+    } else{
+      StudentRepo sRepo = StudentRepo();
+      rawSearches = await sRepo.getList();
+    }
+
+    // print('raw searches: $rawSearches');
+
+    for(int i = 1; i < rawSearches.length; i++){
+      List temp = rawSearches[i];
+      for(var val in temp){
+        if(val.toString().toLowerCase().trim().contains(query.toLowerCase())){
+          validSearches.add(i);
+          break;
+        }
+      }
+    }
+
+    // print('valid searches: $validSearches');
+
+    print(validSearches);
+    return validSearches;
+  }
+
   Future<dynamic> searchItemByIndex(int index, Scope scope)async{
 
     List<List> rawSearches;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
+import 'package:new_ssis_2/repository/student_repo.dart';
 import 'package:new_ssis_2/views/delete_button.dart';
 import 'package:provider/provider.dart';
 
@@ -18,13 +19,22 @@ class StudentsWidget extends StatefulWidget {
 
 class _StudentsWidgetState extends State<StudentsWidget> {
 
+  StudentRepo sRepo = StudentRepo();
   late List<List> tempData;
-
+  late Future<List<List>> repoData;
   int _selectedIndex = -1;
 
+/*  @override
+  void initState() {
+    repoData = sRepo.getList();
+    super.initState();
+  }*/
+
   void callback(){
+    print("students callback");
     setState(() {
-      widget.callback;
+      print("students callback 2");
+      widget.callback();
     });
   }
 
@@ -51,7 +61,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
 
     print("new state");
 
-    Future<List<List>> repoData = searchingController1.getSearchResults(Scope.student);
+    repoData = searchingController1.getSearchResults(Scope.student);
     return Container(
       height: 500,
       margin: const EdgeInsets.only(
@@ -83,14 +93,14 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
                         EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
-                        AddButton(callback: callback)
+                        AddButton(callback: callback, scope: Scope.student)
                       ],
                     )
                 )
               ],
             );
           } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             return Column(
               children: [
@@ -102,7 +112,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
                         EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
-                        AddButton(callback: callback)
+                        AddButton(callback: callback, scope: Scope.student)
                       ],
                     )
                 )
@@ -297,8 +307,16 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                           ),
                           child: Container(
                             padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            child: Text(
-                                data[index][1].toString()
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: MediaQuery.of(context).size.width,
+                              ),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Text(
+                                    data[index][1].toString()
+                                ),
+                              ),
                             ),
                           )
                       ),
@@ -343,8 +361,16 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                           child: Container(
                             padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
                             alignment: Alignment.center,
-                            child: Text(
-                                data[index][3]
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: MediaQuery.of(context).size.width,
+                              ),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Text(
+                                    data[index][3].toString()
+                                ),
+                              ),
                             ),
                           )
                       ),
