@@ -32,19 +32,21 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
   void deleteCallback(){
     print("courses callback");
-    _selectedIndex--;
+
     setState(() {
       print("courses callback 2");
       widget.callback();
+      _selectedIndex--;
     });
   }
 
   void addCallback(){
     print("courses callback");
-    _selectedIndex == tempData.length + 1;
+
     setState(() {
       print("courses callback 2");
       widget.callback();
+      _selectedIndex = tempData.length;
     });
   }
 

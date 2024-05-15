@@ -40,19 +40,19 @@ class _StudentsWidgetState extends State<StudentsWidget> {
 
   void deleteCallback(){
     print("students callback");
-    _selectedIndex--;
     setState(() {
       print("students callback 2");
       widget.callback();
+      _selectedIndex--;
     });
   }
 
   void addCallback(){
     print("students callback");
-    _selectedIndex == tempData.length + 1;
     setState(() {
       print("students callback 2");
       widget.callback();
+      _selectedIndex = tempData.length;
     });
   }
 
