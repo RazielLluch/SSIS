@@ -30,22 +30,18 @@ class StudentRepo{
   }
 
   Future<void> editCsv(int index, List data)async{
-    FileHandler handler = FileHandler('students');
     await handler.editCsv(index, data);
   }
 
   Future<void> deleteCsv(int index)async{
-    FileHandler handler = FileHandler('students');
     await handler.deleteCsv(index);
   }
 
   Future<void> updateCsv(List<List> data) async{
-    FileHandler handler = FileHandler('students');
     await handler.appendCsv(data);
   }
 
   Future<List<List>> getList() async{
-    FileHandler handler = FileHandler('students');
     return await handler.readFile();
   }
 

@@ -38,6 +38,25 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     });
   }
 
+  void deleteCallback(){
+    print("students callback");
+    _selectedIndex--;
+    setState(() {
+      print("students callback 2");
+      widget.callback();
+    });
+  }
+
+  void addCallback(){
+    print("students callback");
+    _selectedIndex == tempData.length + 1;
+    setState(() {
+      print("students callback 2");
+      widget.callback();
+    });
+  }
+
+
   void _handleRowTap(int index) {
     setState(() {
       print("preselected index is: $_selectedIndex");
@@ -91,9 +110,9 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
+                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
                         EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
-                        AddButton(callback: callback, scope: Scope.student)
+                        AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )
                 )
@@ -110,9 +129,9 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
+                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
                         EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
-                        AddButton(callback: callback, scope: Scope.student)
+                        AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )
                 )

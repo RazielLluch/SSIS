@@ -43,6 +43,7 @@ class _DeleteButton extends State<DeleteButton>{
 
     if(widget.scope == Scope.student){
       await sRepo.deleteCsv(widget.index+1);
+      searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
     }else{
       SearchHandler searchHandler = SearchHandler();
       List courseCodes = await cRepo.listPrimaryKeys();
@@ -56,7 +57,8 @@ class _DeleteButton extends State<DeleteButton>{
         List<List> editList = await sRepo.getList();
         List currentData = editList[enrolledStudents[i]];
         currentData[4] = "Not enrolled";
-        sRepo.editCsv(enrolledStudents[i], currentData);
+        await sRepo.editCsv(enrolledStudents[i], currentData);
+        searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
       }
 
       await cRepo.deleteCsv(widget.index+1);

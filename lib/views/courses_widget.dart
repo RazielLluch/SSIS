@@ -23,7 +23,27 @@ class _CoursesWidgetState extends State<CoursesWidget> {
   int _selectedIndex = -1;
 
   void callback(){
+    print("courses callback");
     setState(() {
+      print("courses callback 2");
+      widget.callback();
+    });
+  }
+
+  void deleteCallback(){
+    print("courses callback");
+    _selectedIndex--;
+    setState(() {
+      print("courses callback 2");
+      widget.callback();
+    });
+  }
+
+  void addCallback(){
+    print("courses callback");
+    _selectedIndex == tempData.length + 1;
+    setState(() {
+      print("courses callback 2");
       widget.callback();
     });
   }
@@ -70,9 +90,9 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: callback),
+                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
                         EditButton(data: tempData, index: _selectedIndex, callback: callback, scope: Scope.student),
-                        AddButton(callback: callback, scope: Scope.course)
+                        AddButton(callback: addCallback, scope: Scope.course)
                       ],
                     )
                 )
@@ -89,9 +109,9 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.course, callback: callback),
+                        DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
                         EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.course),
-                        AddButton(callback: callback, scope: Scope.course)
+                        AddButton(callback: addCallback, scope: Scope.course)
                       ],
                     )
                 )

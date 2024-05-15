@@ -106,16 +106,19 @@ class _EditButton extends State<EditButton>{
       List courseCodes = await cRepo.listPrimaryKeys();
       String courseCode = courseCodes[widget.index+1];
 
-      List enrolledStudents = await searchHandler.searchItem(courseCode, Scope.student);
+      print("selected course code: $courseCode");
+
+      List enrolledStudents = await searchHandler.searchItemIndexes(courseCode, Scope.student);
 
       for(int i = 0; i < enrolledStudents.length; i++){
         List<List> editList = await sRepo.getList();
         List currentData = editList[enrolledStudents[i]];
         currentData[4] = data[0];
-        sRepo.editCsv(enrolledStudents[i], currentData);
+        await sRepo.editCsv(enrolledStudents[i], currentData);
+        searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
       }
 
-      cRepo.editCsv(widget.index+1, data);
+      await cRepo.editCsv(widget.index+1, data);
       searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
     }
 

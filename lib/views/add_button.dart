@@ -39,6 +39,7 @@ class _AddButton extends State<AddButton>{
   void initState() {
     searchHandler = SearchHandler();
     searchingController = context.read<SearchingController>(); // Initialize the controller
+    initControllers();
     super.initState();
   }
 
@@ -64,30 +65,21 @@ class _AddButton extends State<AddButton>{
   }
 
   void _resetControllers(){
-    int length;
-
-    if(widget.scope == Scope.student) {
-      length = 3;
-    } else {
-      length = 2;
-    }
-
-    for(int i = 0; i < length; i++){
-      controllers[i].clear();
-    }
+    controllers.clear;
   }
 
   void _addInfo(List data)async{
     if(widget.scope == Scope.student){
       await sRepo.updateCsv([data]);
-      searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
+      _resetControllers();
+      await searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
     }
     else{
       await cRepo.updateCsv([data]);
-      searchingController.searchResult(searchHandler.searchItem("", Scope.course), Scope.course);
+      _resetControllers();
+      await searchingController.searchResult(searchHandler.searchItem("", Scope.course), Scope.course);
     }
     print(data);
-
 
   }
 
@@ -167,8 +159,6 @@ class _AddButton extends State<AddButton>{
 
   Dialog dialogBuilder(){
 
-    initControllers();
-
     double height;
     double width = 350;
     List<String> columns;
@@ -232,9 +222,7 @@ class _AddButton extends State<AddButton>{
             ),
             child: Row(
                 children: [
-                  dropdownButtonBuilder(
-                      courseKeys
-                  )
+                  dropdownButtonBuilder(courseKeys)
                 ]
             )
         ),
@@ -257,8 +245,7 @@ class _AddButton extends State<AddButton>{
                   data.add(sCourseController.text);
                 }
 
-            _addInfo(data);
-                _resetControllers();
+                _addInfo(data);
 
                 Navigator.pop(context);
                 callback();
