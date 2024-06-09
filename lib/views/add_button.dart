@@ -70,14 +70,20 @@ class _AddButton extends State<AddButton>{
 
   void _addInfo(List data)async{
     if(widget.scope == Scope.student){
-      await sRepo.updateCsv([data]);
-      _resetControllers();
-      await searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
+      if(await searchHandler.addStudentValidator(data[0])){
+        await sRepo.updateCsv([data]);
+        _resetControllers();
+        await searchingController.searchResult(
+            searchHandler.searchItem("", Scope.student), Scope.student);
+      }
     }
     else{
-      await cRepo.updateCsv([data]);
-      _resetControllers();
-      await searchingController.searchResult(searchHandler.searchItem("", Scope.course), Scope.course);
+      if(await searchHandler.addCourseValidator(data[0], data[1])){
+        await cRepo.updateCsv([data]);
+        _resetControllers();
+        await searchingController.searchResult(
+            searchHandler.searchItem("", Scope.course), Scope.course);
+      }
     }
     print(data);
 

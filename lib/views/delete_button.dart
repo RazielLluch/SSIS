@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
 import 'package:provider/provider.dart';
-
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
 import '../repository/student_repo.dart';
-
 
 class DeleteButton extends StatefulWidget{
   final int index;
@@ -76,8 +74,6 @@ class _DeleteButton extends State<DeleteButton>{
     }else{
       scope = "Course";
     }
-
-
 
     if(widget.index == -1){
       return FloatingActionButton(

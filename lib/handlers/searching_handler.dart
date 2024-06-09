@@ -77,14 +77,73 @@ class SearchHandler{
 
     return rawSearches[index];
   }
+
+  Future<int> searchIndexById(String id, Scope scope) async {
+    List<List> rawSearches;
+
+    if (scope == Scope.student) {
+      StudentRepo sRepo = StudentRepo();
+      rawSearches = await sRepo.getList();
+
+    } else {
+      CourseRepo cRepo = CourseRepo();
+      rawSearches = await cRepo.getList();
+      print("the courses to search: $rawSearches");
+    }
+
+    print(rawSearches);
+
+    print("execute for loop");
+
+    print("is for loop valid ${1 < rawSearches.length}");
+
+    for (int i = 1; i < rawSearches.length; i++) {
+      if (rawSearches[i][0].toString() == id) {
+        print("current index: $i");
+        return i;
+      }
+    }
+    return 0;
+  }
+
+
+  Future<List> searchItemById(String id, Scope scope) async{
+    if(scope == Scope.student){
+      StudentRepo sRepo = StudentRepo();
+      List<List> students = await sRepo.getList();
+      for(List student in students){
+        if(student[0] == id) return student;
+      }
+      return [];
+    }
+    else{
+      CourseRepo cRepo = CourseRepo();
+      List<List> courses = await cRepo.getList();
+      for(List course in courses){
+        if(course[0] == id) return course;
+      }
+      return [];
+    }
+  }
+
+  Future<bool> addStudentValidator(String id)async{
+      StudentRepo sRepo = StudentRepo();
+      List<List> students = await sRepo.getList();
+      for(dynamic student in students){
+        print("currently evaluating studentId ${student[0]} vs $id");
+        if(student[0] != id) return true;
+      }
+      return false;
+  }
+
+  Future<bool> addCourseValidator(String courseCode, String courseName)async{
+    CourseRepo cRepo = CourseRepo();
+    List<List> courses = await cRepo.getList();
+
+    for(List course in courses){
+      if(course[0] != courseCode && course[1] != courseName) return true;
+    }
+    return false;
+
+  }
 }
-
-// void main()async{
-
-//     print("start");
-//     SearchHandler handler = SearchHandler();
-//     var results = await handler.searchItem("BSCS", Scope.student);
-
-//     print('results: $results');
-
-// }

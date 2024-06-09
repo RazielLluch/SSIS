@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
+import 'package:new_ssis_2/database/models/course_model.dart';
+import 'package:new_ssis_2/views/course_edit_button.dart';
 import 'package:provider/provider.dart';
 
+import '../database/models/model.dart';
 import '../misc/scope.dart';
+import 'CustomRowWidget.dart';
 import 'add_button.dart';
 import 'delete_button.dart';
-import 'edit_button.dart';
+import 'student_edit_button.dart';
 
 class CoursesWidget extends StatefulWidget {
   final VoidCallback callback;
@@ -21,6 +25,8 @@ class _CoursesWidgetState extends State<CoursesWidget> {
   late List<List> tempData;
 
   int _selectedIndex = -1;
+  String _selectedCourseCode = "";
+  CourseModel _selectedCourseModel = CourseModel(courseCode: "", name: "");
 
   void callback(){
     print("courses callback");
@@ -50,18 +56,28 @@ class _CoursesWidgetState extends State<CoursesWidget> {
     });
   }
 
-  void _handleRowTap(int index) {
+  void _handleRowTap(int index, String id, Model courseModel) {
     setState(() {
       print("preselected index is: $_selectedIndex");
-      if(index == _selectedIndex) {
+      if (id == _selectedCourseCode) {
         _selectedIndex = -1;
-      }
-      else  {
+        _selectedCourseCode = "";
+        _selectedCourseModel = CourseModel(courseCode: '', name: '');
+      } else {
         _selectedIndex = index;
+        _selectedCourseCode = id;
+        // Check if courseModel is a CourseModel before assigning
+        if (courseModel is CourseModel) {
+          _selectedCourseModel = courseModel;
+        } else {
+          // Handle the case where courseModel is not a CourseModel
+          throw ArgumentError('Expected a CourseModel, but got ${courseModel.runtimeType}');
+        }
       }
       print("postselected index is: $_selectedIndex");
     });
   }
+
 
 
   @override
@@ -87,13 +103,13 @@ class _CoursesWidgetState extends State<CoursesWidget> {
             return Column(
               children: [
                 tableHeader(),
-                tableElements(tempData),
+                tableElements(snapshot.data!),
                 Container(
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
-                        EditButton(data: tempData, index: _selectedIndex, callback: callback, scope: Scope.student),
+                        DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
+                        CourseEditButton(courseData: _selectedCourseModel!,callback: callback),
                         AddButton(callback: addCallback, scope: Scope.course)
                       ],
                     )
@@ -112,7 +128,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
-                        EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.course),
+                        CourseEditButton(courseData: _selectedCourseModel!,callback: callback),
                         AddButton(callback: addCallback, scope: Scope.course)
                       ],
                     )
@@ -127,8 +143,10 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
 
   Container tableHeader(){
+
+    Color headerColor = const Color(0xffE8E8E8);
+
     return Container(
-      // color: Colors.lightBlueAccent.shade700,
       padding: const EdgeInsets.only(top: 5, bottom: 5),
       child: Row(
           children: [
@@ -137,6 +155,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                 margin: const EdgeInsets.only(right: 5),
                 padding: const EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -155,6 +174,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
             Container(
                 width: 326.6,
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -193,74 +213,8 @@ class _CoursesWidgetState extends State<CoursesWidget> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
-          children: List<GestureDetector>.generate(data.length, (index) {
-
-            double hPadding = 20;
-            double vPadding = 5;
-            double inset = 5;
-
-            return GestureDetector(
-              onTap: (){
-                _handleRowTap(index);
-              },
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Row(
-                    children: [
-                      Container(
-                          width: 120,
-                          margin: EdgeInsets.only(right: inset),
-                          padding: EdgeInsets.only(right: inset),
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                                  ? Colors.lightBlueAccent.withOpacity(0.5)
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            child: Text(
-                                data[index][0].toString()
-                            ),
-                          )
-                      ),
-                      Container(
-                          width: 326.6,
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                                  ? Colors.lightBlueAccent.withOpacity(0.5)
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width,
-                              ),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                    data[index][1].toString()
-                                ),
-                              ),
-                            ),
-                          )
-                      ),
-                    ]
-                ),
-              ),
-            );
+          children: List<CustomRowWidget>.generate(data.length, (index) {
+            return CustomRowWidget(data: data[index], index: index, selectedIndex: _selectedIndex, handleRowTap: _handleRowTap, scope: Scope.course,);
           }),
         ),
       ),

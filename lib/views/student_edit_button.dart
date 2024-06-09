@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_ssis_2/database/models/student_model.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
@@ -8,30 +9,32 @@ import '../repository/course_repo.dart';
 import '../repository/student_repo.dart';
 
 
-class EditButton extends StatefulWidget{
-  final int index;
-  List<List> data;
+class StudentEditButton extends StatefulWidget{
+  final StudentModel studentData;
   final VoidCallback callback;
-  final Scope scope;
-  EditButton({super.key, required this.data,required this.index, required this.callback, required this.scope});
+  StudentEditButton({super.key, required this.studentData, required this.callback});
 
   @override
-  State<EditButton> createState() => _EditButton();
+  State<StudentEditButton> createState() => _StudentEditButton();
 }
 
-class _EditButton extends State<EditButton>{
+class _StudentEditButton extends State<StudentEditButton>{
 
-  late String scope;
+  late int index;
+
   CourseRepo cRepo = CourseRepo();
   static late Future<List>? courseKeys;
 
   late StudentRepo sRepo;
-  late Future<List<List>> data;
   late SearchingController searchingController;
   late SearchHandler searchHandler;
 
   final sCourseController = TextEditingController();
+  final genderController = TextEditingController();
   late dynamic _dropdownValue;
+  late dynamic _genderDropdownValue;
+
+  Scope scope = Scope.student;
 
   List<TextEditingController>  controllers = [];
 
@@ -47,44 +50,37 @@ class _EditButton extends State<EditButton>{
     widget.callback();
   }
 
-  void initControllers(){
+  void initControllers()async{
     int length;
 
-    if(widget.scope == Scope.student) {
-      length = 4;
-    } else {
-      length = 2;
-    }
+    index = await searchHandler.searchIndexById(widget.studentData.id, scope);
+
+    length = 4;
 
     for(int i = 0; i < length; i++){
       controllers.add(TextEditingController());
     }
 
+    sCourseController.text = widget.studentData.course!;
+
     print("controllers length: ${controllers.length}");
   }
 
-  void _setControllers(){
+  void _setControllers()async{
     int length;
 
-    if(widget.scope == Scope.student) {
-      length = 4;
-    } else {
-      length = 2;
-    }
+    length = 4;
 
-    for(int i = 0; i < length; i++){
-      controllers[i].text = widget.data[widget.index][i].toString();
-    }
+    controllers[0].text = widget.studentData.id.toString();
+    controllers[1].text = widget.studentData.name.toString();
+    controllers[2].text = widget.studentData.year.toString();
+    controllers[3].text = widget.studentData.gender.toString();
   }
 
   void _resetControllers(){
     int length;
 
-    if(widget.scope == Scope.student) {
-      length = 4;
-    } else {
-      length = 2;
-    }
+    length = 4;
 
     for(int i = 0; i < length; i++){
       controllers[i].clear();
@@ -92,35 +88,16 @@ class _EditButton extends State<EditButton>{
   }
 
   void _editInfo(List data)async{
-    if(widget.scope == Scope.student){
-      sRepo = StudentRepo();
-      if(data[4] == "CourseCode"){
-        data[4] = "Not enrolled";
-      }
-      await sRepo.editCsv(widget.index+1, data);
-      searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
+    sRepo = StudentRepo();
+    if(data[4] == "CourseCode"){
+      data[4] = "Not enrolled";
     }
-    else{
 
-      SearchHandler searchHandler = SearchHandler();
-      List courseCodes = await cRepo.listPrimaryKeys();
-      String courseCode = courseCodes[widget.index+1];
+    int index = await searchHandler.searchIndexById(widget.studentData.id, Scope.student);
+    print("the index of the student to edit is $index");
 
-      print("selected course code: $courseCode");
-
-      List enrolledStudents = await searchHandler.searchItemIndexes(courseCode, Scope.student);
-
-      for(int i = 0; i < enrolledStudents.length; i++){
-        List<List> editList = await sRepo.getList();
-        List currentData = editList[enrolledStudents[i]];
-        currentData[4] = data[0];
-        await sRepo.editCsv(enrolledStudents[i], currentData);
-        searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
-      }
-
-      await cRepo.editCsv(widget.index+1, data);
-      searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
-    }
+    await sRepo.editCsv(index, data);
+    searchingController.defaultStudentSearch();
 
     print(data);
   }
@@ -150,10 +127,10 @@ class _EditButton extends State<EditButton>{
 
           print(snapshot.data!);
 
-          if(widget.data[widget.index][4] == null || widget.data[widget.index][4].toString() == "Not enrolled" || widget.data[widget.index][4].toString().isEmpty){
+          if(widget.studentData.course == null || widget.studentData.course.toString() == "Not enrolled" || widget.studentData.course.toString().isEmpty){
             _dropdownValue = snapshot.data![0];
           }else{
-            _dropdownValue = widget.data[widget.index][4];
+            _dropdownValue = widget.studentData.course;
           }
 
           print(_dropdownValue);
@@ -187,32 +164,49 @@ class _EditButton extends State<EditButton>{
     );
   }
 
+  genderDropdown(List genders) {
+    // If the student has a gender set, use that as the initial value, otherwise default to the first item in the list.
+    _genderDropdownValue = widget.studentData.gender ?? genders[0];
+
+    return Expanded(
+      child: DropdownButton(
+        value: _genderDropdownValue,
+        items: genders.map((dynamic value) {
+          return DropdownMenuItem(
+            value: value,
+            child: Container(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(value),
+            ),
+          );
+        }).toList(),
+        onChanged: (selectedValue) {
+          if (selectedValue is String) {
+            setState(() {
+              _genderDropdownValue = selectedValue;
+              genderController.text = selectedValue;
+            });
+          }
+        },
+      ),
+    );
+  }
+
+
   Dialog dialogBuilder(){
 
     double height;
     double width = 350;
     List<String> columns;
-    if(widget.scope == Scope.student){
-      height = 450;
-      columns = ["ID Number", "Name", "Year Level", "Gender", "Course Code"];
-      scope = "student";
-    }else{
-      height = 270;
-      columns = ["Course Code", "Course Name"];
-      scope = "course";
-    }
+    height = 450;
+    columns = ["ID Number", "Name", "Year Level", "Gender", "Course Code"];
 
     List<Widget> dialogElements = [
-      Text(
-          "Edit $scope"
+      const Text(
+          "Edit student"
       )
     ];
-    int length;
-    if(widget.scope == Scope.student) {
-      length = 4;
-    } else {
-      length = 2;
-    }
+    int length = 3;
 
     for(int i = 0; i < length; i++){
       dialogElements.add(
@@ -226,26 +220,41 @@ class _EditButton extends State<EditButton>{
       );
     }
 
-    if(widget.scope == Scope.student){
+    List genders = ["N/A","Male", "Female", "Non-binary", "other"];
 
-      Future<List> courseKeys = cRepo.listPrimaryKeys();
+    dialogElements.add(
+      Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Row(
+              children: [
+                genderDropdown(genders)
+              ]
+          )
+      ),
+    );
 
-      dialogElements.add(
-        Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Row(
-                children: [
-                  dropdownButtonBuilder(
-                      courseKeys
-                  )
-                ]
-            )
-        ),
-      );
-    }
+
+    Future<List> courseKeys = cRepo.listPrimaryKeys();
+
+    dialogElements.add(
+      Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Row(
+              children: [
+                dropdownButtonBuilder(
+                    courseKeys
+                )
+              ]
+          )
+      ),
+    );
+
 
     dialogElements.add(
         Container(
@@ -258,7 +267,7 @@ class _EditButton extends State<EditButton>{
                 for(int i = 0; i < controllers.length; i++){
                   data.add(controllers[i].text);
                 }
-                if(widget.scope == Scope.student) data.add(sCourseController.text);
+                data.add(sCourseController.text);
 
 
                 _editInfo(data);
@@ -288,21 +297,17 @@ class _EditButton extends State<EditButton>{
   @override
   Widget build(BuildContext context){
 
-    if(widget.scope == Scope.student){
-      scope = "Student";
-    }else{
-      scope = "Course";
-    }
-
     sRepo = StudentRepo();
     courseKeys = cRepo.listPrimaryKeys();
-    data = sRepo.getList();
 
-    if(widget.index == -1){
+
+
+
+    if(widget.studentData.id == ""){
       return FloatingActionButton(
         onPressed:  null,
         backgroundColor: Colors.grey,
-        tooltip: 'Select a $scope to edit first!',
+        tooltip: 'Select a student to edit first!',
         child: const Icon(Icons.edit),
       );
     }
@@ -321,7 +326,7 @@ class _EditButton extends State<EditButton>{
               }
           );
         },
-        tooltip: 'Edit $scope',
+        tooltip: 'Edit student',
         child: const Icon(Icons.edit),
       );
     }
