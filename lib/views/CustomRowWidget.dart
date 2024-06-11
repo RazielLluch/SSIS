@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/database/models/course_model.dart';
 import 'package:new_ssis_2/database/models/student_model.dart';
@@ -54,7 +55,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
             child: Row(
               children: List<Widget>.generate(length, (listIndex) {
 
-                if(widget.scope == Scope.course && listIndex == 1){
+                if(widget.scope == Scope.course){
                   return _buildScrollableCell(
                     context,
                     width: widths[listIndex],
@@ -63,6 +64,18 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
                     hPadding: hPadding,
                     vPadding: vPadding,
                     inset: inset,
+                    alignment: listIndex == 1 ? Alignment.centerLeft : Alignment.center,
+                  );
+                }else if(listIndex == 4){
+                  return _buildScrollableCell(
+                    context,
+                    width: 120,
+                    content: widget.data[listIndex].toString(),
+                    isSelected: _selectedIndex == index,
+                    hPadding: hPadding,
+                    vPadding: vPadding,
+                    inset: inset,
+                    alignment: Alignment.center,
                   );
                 }else{
                   return _buildCell(
@@ -115,7 +128,8 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
         required bool isSelected,
         required double hPadding,
         required double vPadding,
-        required double inset}) {
+        required double inset,
+        required AlignmentGeometry alignment}) {
     return Container(
       width: width,
       // margin: EdgeInsets.only(right: inset),
@@ -130,6 +144,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
         borderRadius: const BorderRadius.all(Radius.circular(15)),
       ),
       child: Container(
+        alignment: alignment,
         padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -137,7 +152,9 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
           ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Text(content),
+            child: Container(
+                child: Text(content),
+            ),
           ),
         ),
       ),

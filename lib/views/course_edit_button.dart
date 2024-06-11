@@ -70,18 +70,24 @@ class _CourseEditButton extends State<CourseEditButton>{
   void _editInfo(List data)async{
     cRepo = CourseRepo();
 
+    String courseCode = widget.courseData.courseCode;
+
     int index = await searchHandler.searchIndexById(widget.courseData.courseCode, Scope.course);
     print("the index of the course to edit is $index");
 
     await cRepo.editCsv(index, data);
 
+    List<int> studentIndexes = await searchHandler.searchItemIndexes(courseCode, Scope.student);
+    print("these are the students to edit: $studentIndexes");
     StudentRepo sRepo = StudentRepo();
 
+    for(int studentIndex in studentIndexes){
+      List student = await searchHandler.searchItemByIndex(studentIndex, Scope.student);
+      student[4] = data[0];
+      await sRepo.editCsv(studentIndex, student);
+    }
 
-
-    searchingController.defaultCourseSearch();
-
-    print(data);
+    await searchingController.initialize();
   }
 
   Dialog dialogBuilder(){

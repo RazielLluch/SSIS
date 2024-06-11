@@ -126,24 +126,54 @@ class SearchHandler{
     }
   }
 
-  Future<bool> addStudentValidator(String id)async{
-      StudentRepo sRepo = StudentRepo();
-      List<List> students = await sRepo.getList();
-      for(dynamic student in students){
-        print("currently evaluating studentId ${student[0]} vs $id");
-        if(student[0] != id) return true;
-      }
-      return false;
-  }
-
-  Future<bool> addCourseValidator(String courseCode, String courseName)async{
-    CourseRepo cRepo = CourseRepo();
-    List<List> courses = await cRepo.getList();
-
-    for(List course in courses){
-      if(course[0] != courseCode && course[1] != courseName) return true;
+  Future<bool> searchIds(String id) async{
+    StudentRepo sRepo = StudentRepo();
+    List<List> data = await sRepo.getList();
+    for(int i = 0 ; i < data.length; i++){
+      if(data[i][0] == id) return false;
     }
-    return false;
 
+    return true;
   }
+
+  Future<bool> searchCourseCode(String courseCode) async{
+    CourseRepo cRepo = CourseRepo();
+    List<dynamic> courseCodes = await cRepo.listPrimaryKeys();
+    for(dynamic code in courseCodes){
+      if(code == courseCode) return false;
+    }
+
+    return true;
+  }
+
+  Future<bool> searchCourseName(String courseName) async{
+    CourseRepo cRepo = CourseRepo();
+    List<List> courseCodes = await cRepo.getList();
+    for(int i = 0; i < courseCodes.length; i++){
+      if(courseCodes[i][1] == courseName) return false;
+    }
+
+    return true;
+  }
+
+  // Future<bool> addStudentValidator(String id)async{
+  //     StudentRepo sRepo = StudentRepo();
+  //     List<List> students = await sRepo.getList();
+  //     for(dynamic student in students){
+  //       print("currently evaluating studentId ${student[0]} vs $id");
+  //       if(student[0] != id) return true;
+  //     }
+  //     return false;
+  // }
+  //
+  // Future<bool> addCourseValidator(String courseCode, String courseName)async{
+  //   CourseRepo cRepo = CourseRepo();
+  //   List<List> courses = await cRepo.getList();
+  //
+  //   for(List course in courses){
+  //     if(course[0] != courseCode && course[1] != courseName) return true;
+  //   }
+  //   return false;
+  //
+  // }
 }

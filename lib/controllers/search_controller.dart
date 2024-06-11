@@ -14,7 +14,7 @@ class SearchingController extends ChangeNotifier{
     initialize();
   }
 
-  void initialize() async {
+  Future<void> initialize() async {
     _studentSearchResults = await searchHandler.searchItem("", Scope.student);
     print("notifying students");
     notifyListeners();
