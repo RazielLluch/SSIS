@@ -28,10 +28,14 @@ class _CoursesWidgetState extends State<CoursesWidget> {
   String _selectedCourseCode = "";
   CourseModel _selectedCourseModel = CourseModel(courseCode: "", name: "");
 
-  void callback(){
+  void editCallback(int index, CourseModel courseModel){
     print("courses callback");
     setState(() {
       print("courses callback 2");
+
+      _selectedIndex = index;
+      _selectedCourseModel = courseModel;
+
       widget.callback();
     });
   }
@@ -41,8 +45,11 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
     setState(() {
       print("courses callback 2");
+
+      _selectedIndex = -1;
+      _selectedCourseModel = CourseModel(courseCode: '', name: '');
+
       widget.callback();
-      _selectedIndex--;
     });
   }
 
@@ -52,6 +59,10 @@ class _CoursesWidgetState extends State<CoursesWidget> {
     setState(() {
       print("courses callback 2");
       widget.callback();
+
+      _selectedIndex = -1;
+      _selectedCourseModel = CourseModel(courseCode: '', name: '');
+
       _selectedIndex = tempData.length;
     });
   }
@@ -109,7 +120,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
-                        CourseEditButton(courseData: _selectedCourseModel!,callback: callback),
+                        CourseEditButton(courseData: _selectedCourseModel,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.course)
                       ],
                     )
@@ -128,7 +139,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
-                        CourseEditButton(courseData: _selectedCourseModel!,callback: callback),
+                        CourseEditButton(courseData: _selectedCourseModel,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.course)
                       ],
                     )

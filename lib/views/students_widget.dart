@@ -36,10 +36,14 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     super.initState();
   }*/
 
-  void callback(){
+  void editCallback(int index, StudentModel studentModel){
     print("students callback");
     setState(() {
       print("students callback 2");
+
+      _selectedIndex = index;
+      _selectedStudentModel = studentModel;
+
       widget.callback();
     });
   }
@@ -48,8 +52,12 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     print("students callback");
     setState(() {
       print("students callback 2");
+
+      _selectedIndex = -1;
+      _selectedStudentModel = StudentModel(id: '', name: '', gender: '');
+
+
       widget.callback();
-      _selectedIndex--;
     });
   }
 
@@ -57,8 +65,11 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     print("students callback");
     setState(() {
       print("students callback 2");
+
+      _selectedIndex = -1;
+      _selectedStudentModel = StudentModel(id: '', name: '', gender: '');
+
       widget.callback();
-      _selectedIndex = tempData.length;
     });
   }
 
@@ -118,7 +129,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
-                        StudentEditButton(studentData: _selectedStudentModel!,callback: callback),
+                        StudentEditButton(studentData: _selectedStudentModel!,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )
@@ -137,7 +148,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
-                        StudentEditButton(studentData: _selectedStudentModel!, callback: callback),
+                        StudentEditButton(studentData: _selectedStudentModel!, callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )

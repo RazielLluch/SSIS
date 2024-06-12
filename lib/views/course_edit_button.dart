@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/database/models/course_model.dart';
 import 'package:new_ssis_2/database/models/student_model.dart';
+import 'package:new_ssis_2/handlers/course_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
@@ -12,8 +13,8 @@ import '../repository/student_repo.dart';
 
 class CourseEditButton extends StatefulWidget{
   final CourseModel courseData;
-  final VoidCallback callback;
-  CourseEditButton({super.key, required this.courseData, required this.callback});
+  final Function(int index, CourseModel courseModel) callback;
+  const CourseEditButton({super.key, required this.courseData, required this.callback});
 
   @override
   State<CourseEditButton> createState() => _CourseEditButton();
@@ -40,7 +41,8 @@ class _CourseEditButton extends State<CourseEditButton>{
 
   void callback(){
     print("edit callback");
-    widget.callback();
+    index = -1;
+    widget.callback(index, CourseModel(courseCode: "", name: ""));
   }
 
   void initControllers()async{
@@ -67,27 +69,59 @@ class _CourseEditButton extends State<CourseEditButton>{
     }
   }
 
-  void _editInfo(List data)async{
-    cRepo = CourseRepo();
+  Future<void> _editInfo(List data)async{
 
-    String courseCode = widget.courseData.courseCode;
 
-    int index = await searchHandler.searchIndexById(widget.courseData.courseCode, Scope.course);
-    print("the index of the course to edit is $index");
+    try{
+      CourseValidator courseValidator = CourseValidator(courseCode: data[0], courseName: data[1], exclude1: widget.courseData.courseCode, exclude2: widget.courseData.name);
+      await courseValidator.validate();
 
-    await cRepo.editCsv(index, data);
+      cRepo = CourseRepo();
 
-    List<int> studentIndexes = await searchHandler.searchItemIndexes(courseCode, Scope.student);
-    print("these are the students to edit: $studentIndexes");
-    StudentRepo sRepo = StudentRepo();
+      String courseCode = widget.courseData.courseCode;
 
-    for(int studentIndex in studentIndexes){
-      List student = await searchHandler.searchItemByIndex(studentIndex, Scope.student);
-      student[4] = data[0];
-      await sRepo.editCsv(studentIndex, student);
+      int index = await searchHandler.searchIndexById(widget.courseData.courseCode, Scope.course);
+      print("the index of the course to edit is $index");
+
+      await cRepo.editCsv(index, data);
+
+      List<int> studentIndexes = await searchHandler.searchItemIndexes(courseCode, Scope.student);
+      print("these are the students to edit: $studentIndexes");
+      StudentRepo sRepo = StudentRepo();
+
+      for(int studentIndex in studentIndexes){
+        List student = await searchHandler.searchItemByIndex(studentIndex, Scope.student);
+        student[4] = data[0];
+        await sRepo.editCsv(studentIndex, student);
+      }
+
+      await searchingController.initialize();
+      print(data);
+    }catch (e, stackTrace){
+      print(stackTrace);
+      throw Exception(e.toString());
     }
 
-    await searchingController.initialize();
+  }
+
+  void _showErrorDialog(BuildContext context, String text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Invalid field entered"),
+          content: Text(text),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Dialog dialogBuilder(){
@@ -120,19 +154,32 @@ class _CourseEditButton extends State<CourseEditButton>{
             alignment: Alignment.centerRight,
             child: TextButton(
               child: const Text("edit"),
-              onPressed: (){
+              onPressed: ()async{
 
                 List data = [];
                 for(int i = 0; i < controllers.length; i++){
                   data.add(controllers[i].text);
                 }
 
-                _editInfo(data);
-                _resetControllers();
+                try{
+                  print("trying edit info");
+                  await _editInfo(data);
+                  print("tried edit into");
 
-                callback();
-                Navigator.pop(context);
 
+                  _resetControllers();
+                  callback();
+                  Navigator.pop(context);
+
+                }catch (e, stackTrace){
+                  print("showing error dialog");
+                  print(stackTrace);
+
+                  String errorText = e.toString();
+                  errorText = errorText.replaceAll("Exception: Exception: ", "");
+
+                  _showErrorDialog(context, errorText);
+                }
               },
             )
         )

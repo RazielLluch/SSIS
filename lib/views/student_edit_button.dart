@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/database/models/student_model.dart';
+import 'package:new_ssis_2/handlers/student_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
@@ -11,8 +12,8 @@ import '../repository/student_repo.dart';
 
 class StudentEditButton extends StatefulWidget{
   final StudentModel studentData;
-  final VoidCallback callback;
-  StudentEditButton({super.key, required this.studentData, required this.callback});
+  final Function(int, StudentModel) callback;
+  const StudentEditButton({super.key, required this.studentData, required this.callback(int index, StudentModel student)});
 
   @override
   State<StudentEditButton> createState() => _StudentEditButton();
@@ -47,7 +48,8 @@ class _StudentEditButton extends State<StudentEditButton>{
 
   void callback(){
     print("edit callback");
-    widget.callback();
+    index = -1;
+    widget.callback(index, StudentModel(id: "", name: "", gender: ""));
   }
 
   void initControllers()async{
@@ -87,19 +89,37 @@ class _StudentEditButton extends State<StudentEditButton>{
     }
   }
 
-  void _editInfo(List data)async{
+  Future<void> _editInfo(List data)async{
     sRepo = StudentRepo();
     if(data[4] == "CourseCode"){
       data[4] = "Not enrolled";
     }
 
-    int index = await searchHandler.searchIndexById(widget.studentData.id, Scope.student);
-    print("the index of the student to edit is $index");
 
-    await sRepo.editCsv(index, data);
-    searchingController.defaultStudentSearch();
+    try{
+        StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2], exclude: widget.studentData.id);
+        await studentValidator.validate();
+        _resetControllers();
 
-    print(data);
+        int index = await searchHandler.searchIndexById(data[0], Scope.student);
+
+        sRepo.editCsv(index, data);
+        await searchingController.searchResult(
+            searchHandler.searchItem("", Scope.student), Scope.student);
+
+        print(data);
+    }catch (e, stackTrace){
+      print(stackTrace);
+      throw Exception(e.toString());
+    }
+
+    // int index = await searchHandler.searchIndexById(widget.studentData.id, Scope.student);
+    // print("the index of the student to edit is $index");
+    //
+    // await sRepo.editCsv(index, data);
+    // searchingController.defaultStudentSearch();
+    //
+    // print(data);
   }
 
   //this function is only used in the scope of a student
@@ -109,6 +129,26 @@ class _StudentEditButton extends State<StudentEditButton>{
         sCourseController.text = selectedValue;
       });
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String text) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Invalid field entered"),
+          content: Text(text),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   FutureBuilder dropdownButtonBuilder(Future<List>? items){
@@ -261,7 +301,7 @@ class _StudentEditButton extends State<StudentEditButton>{
             alignment: Alignment.centerRight,
             child: TextButton(
               child: const Text("edit"),
-              onPressed: (){
+              onPressed: ()async{
 
                 List data = [];
                 for(int i = 0; i < controllers.length; i++){
@@ -270,12 +310,25 @@ class _StudentEditButton extends State<StudentEditButton>{
                 data.add(sCourseController.text);
 
 
-                _editInfo(data);
-                _resetControllers();
+                try{
+                  print("trying edit info");
+                  await _editInfo(data);
+                  print("tried edit into");
 
-                callback();
-                Navigator.pop(context);
 
+                  _resetControllers();
+                  callback();
+                  Navigator.pop(context);
+
+                }catch (e, stackTrace){
+                  print("showing error dialog");
+                  print(stackTrace);
+
+                  String errorText = e.toString();
+                  errorText = errorText.replaceAll("Exception: Exception: ", "");
+
+                  _showErrorDialog(context, errorText);
+                }
               },
             )
         )
@@ -304,7 +357,7 @@ class _StudentEditButton extends State<StudentEditButton>{
 
 
     if(widget.studentData.id == ""){
-      return FloatingActionButton(
+      return const FloatingActionButton(
         onPressed:  null,
         backgroundColor: Colors.grey,
         tooltip: 'Select a student to edit first!',

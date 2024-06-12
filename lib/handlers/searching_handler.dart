@@ -126,31 +126,34 @@ class SearchHandler{
     }
   }
 
-  Future<bool> searchIds(String id) async{
+  Future<bool> searchIds({required String id, String? exclude}) async{
     StudentRepo sRepo = StudentRepo();
     List<List> data = await sRepo.getList();
     for(int i = 0 ; i < data.length; i++){
+      if(exclude != null && data[i][0] == exclude) continue;
       if(data[i][0] == id) return false;
     }
 
     return true;
   }
 
-  Future<bool> searchCourseCode(String courseCode) async{
+  Future<bool> searchCourseCode({required String courseCode, String? exclude}) async{
     CourseRepo cRepo = CourseRepo();
     List<dynamic> courseCodes = await cRepo.listPrimaryKeys();
     for(dynamic code in courseCodes){
+      if(exclude != null && code == exclude) continue;
       if(code == courseCode) return false;
     }
 
     return true;
   }
 
-  Future<bool> searchCourseName(String courseName) async{
+  Future<bool> searchCourseName({required String courseName, String? exclude}) async{
     CourseRepo cRepo = CourseRepo();
-    List<List> courseCodes = await cRepo.getList();
-    for(int i = 0; i < courseCodes.length; i++){
-      if(courseCodes[i][1] == courseName) return false;
+    List<List> courses= await cRepo.getList();
+    for(int i = 0; i < courses.length; i++){
+      if(exclude != null && courses[i][1] == exclude) continue;
+      if(courses[i][1] == courseName) return false;
     }
 
     return true;

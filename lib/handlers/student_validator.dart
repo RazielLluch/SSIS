@@ -6,27 +6,31 @@ import '../misc/scope.dart';
 
 class StudentValidator{
 
-  final String _studentId;
-  final String _year;
+  final String studentId;
+  final String year;
+  final String? exclude;
+  StudentValidator({required this.studentId, required this.year, this.exclude});
 
-  StudentValidator(this._studentId, this._year);
-
-  Future<bool> validate() async{
+  Future<void> validate() async{
     SearchHandler searchHandler = SearchHandler();
+
+    bool validId = false;
+    if(await searchHandler.searchIds(id: studentId, exclude: exclude)) {
+      validId = true;
+    } else {
+      throw Exception("A student with that ID number already exists!");
+    }
 
     bool validYear;
 
     try{
-      int.parse(_year);
+      int value = int.parse(year);
+      if(value > 6 || value < 1){
+        throw Exception("You entered an invalid year level. Only input a year from 1 to 6!");
+      }
       validYear = true;
-    }on Exception{
-      validYear = false;
-    }
-
-    if(await searchHandler.searchIds(_studentId) && validYear) {
-      return true;
-    } else {
-      return false;
+    }catch (e){
+      throw Exception("You entered an invalid year level. Only input a year from 1 to 6!");
     }
   }
 

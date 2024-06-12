@@ -71,48 +71,51 @@ class _AddButton extends State<AddButton> {
     }
   }
 
-  Future<bool> _addInfo(List data) async {
-    if (widget.scope == Scope.student) {
-      StudentValidator studentValidator = StudentValidator(data[0], data[2]);
+  Future<void> _addInfo(List data) async {
 
-      if (await studentValidator.validate()) {
-        await sRepo.updateCsv([data]);
-        _resetControllers();
-        await searchingController.searchResult(
-            searchHandler.searchItem("", Scope.student), Scope.student);
 
-        print(data);
-        return true;
-      } else {
-        return false;
+      try{
+        if(widget.scope == Scope.student){
+          StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2]);
+          await studentValidator.validate();
+          _resetControllers();
+
+          await sRepo.updateCsv([data]);
+
+          await searchingController.searchResult(
+              searchHandler.searchItem("", Scope.student), Scope.student);
+
+
+          
+          print(data);
+        }else{
+          CourseValidator courseValidator = CourseValidator(courseCode: data[0],courseName:  data[1]);
+
+          await courseValidator.validate();
+          _resetControllers();
+
+          await cRepo.updateCsv([data]);
+          await searchingController.searchResult(
+              searchHandler.searchItem("", Scope.course), Scope.course);
+
+          print("printing course data: $data");
+        }
+      }catch (e, stackTrace){
+        print(stackTrace);
+        throw Exception(e.toString());
       }
-    } else {
-      CourseValidator courseValidator = CourseValidator(data[0], data[1]);
-
-      if (await courseValidator.validate()) {
-        await cRepo.updateCsv([data]);
-        _resetControllers();
-        await searchingController.searchResult(
-            searchHandler.searchItem("", Scope.course), Scope.course);
-
-        print(data);
-        return true;
-      } else {
-        return false;
-      }
-    }
   }
 
-  void _showErrorDialog(BuildContext context) {
+  void _showErrorDialog(BuildContext context, String text) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Error"),
-          content: Text("You entered invalid data in one of the fields."),
+          title: const Text("Invalid field entered"),
+          content: Text(text),
           actions: <Widget>[
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -265,14 +268,26 @@ class _AddButton extends State<AddButton> {
               data.add(sCourseController.text);
             }
 
-            bool result = await _addInfo(data);
-            if (result) {
+            try{
+              await _addInfo(data);
               _courseDropdownValue = "course";
               Navigator.pop(context);
               callback();
-            } else {
-              _showErrorDialog(context);
+            }catch (e, stackTrace){
+              print("showing error dialog");
+              print(stackTrace);
+
+              String errorText = e.toString();
+              errorText = errorText.replaceAll("Exception: Exception: ", "");
+
+              _showErrorDialog(context, errorText);
             }
+
+            // if (result) {
+            //
+            // } else {
+            //
+            // }
           },
         )));
 
