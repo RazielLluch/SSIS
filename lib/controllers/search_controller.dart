@@ -1,29 +1,32 @@
 import 'package:flutter/cupertino.dart';
+import 'package:new_ssis_2/database/student_db.dart';
+import 'package:new_ssis_2/database/models/course_model.dart';
+import 'package:new_ssis_2/database/models/student_model.dart';
 import 'package:new_ssis_2/handlers/searching_handler.dart';
 
+import '../database/course_db.dart';
+import '../database/models/model.dart';
 import '../misc/scope.dart';
 
 class SearchingController extends ChangeNotifier{
 
   SearchHandler searchHandler = SearchHandler();
   
-  late List<List<dynamic>> _studentSearchResults;
-  late List<List<dynamic>> _courseSearchResults;
+  late List<StudentModel> _studentSearchResults = [];
+  late List<CourseModel> _courseSearchResults = [];
 
   SearchingController(){
     initialize();
   }
 
   Future<void> initialize() async {
-    _studentSearchResults = await searchHandler.searchItem("", Scope.student);
-    print("notifying students");
-    notifyListeners();
-    _courseSearchResults = await searchHandler.searchItem("", Scope.course);
-    print("notifying courses");
-    notifyListeners();
+
+    await defaultStudentSearch();
+
+    await defaultCourseSearch();
   }
 
-  Future<List<List<dynamic>>> getSearchResults(Scope scope) async{
+  Future<List<dynamic>> getSearchResults(Scope scope) async{
     if(scope == Scope.student) {
       return _studentSearchResults;
     } else {
@@ -32,26 +35,53 @@ class SearchingController extends ChangeNotifier{
   }
 
   Future<void> defaultStudentSearch()async{
-    _studentSearchResults = await searchHandler.searchItem("", Scope.student);
+
+    _studentSearchResults = await StudentDB().fetchBySearch("");
+    print("notifying students");
     notifyListeners();
   }
 
   Future<void> defaultCourseSearch()async{
-    _courseSearchResults = await searchHandler.searchItem("", Scope.course);
+
+    _courseSearchResults = await CourseDB().fetchBySearch("");
+    print("notifying courses");
     notifyListeners();
   }
 
+
   Future<void> searchResult(Future<List<List<dynamic>>> value, Scope scope) async{
+    List<List> values = await value;
 
     if(scope == Scope.student){
-      _studentSearchResults = await value;
+      List<StudentModel> students = [];
+      if(values.isNotEmpty){
+        for(List item in values){
+          students.add(StudentModel(
+              id: item[0],
+              name: item[1],
+              year: item[2],
+              gender: item[3],
+              course: item[4]
+          ));
+        }
+      }
+
+      _studentSearchResults = students;
     }else{
-      _courseSearchResults = await value;
+      List<CourseModel> courses = [];
+      if(values.isNotEmpty){
+        for(List item in values){
+          courses.add(CourseModel(
+            courseCode: item[0],
+            name: item[1],
+          ));
+        }
+      }
+
+      _courseSearchResults = courses;
     }
 
     print("printing from search_controller $value");
     notifyListeners();
   }
-
-
 }

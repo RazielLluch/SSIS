@@ -1,21 +1,27 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:new_ssis_2/database/SsisDatabase.dart';
 import 'package:new_ssis_2/views/searchbar_widget.dart';
 import 'package:new_ssis_2/views/students_widget.dart';
 import 'package:new_ssis_2/views/courses_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'controllers/search_controller.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
 
-  // runApp(
-  //     ChangeNotifierProvider(
-  //       create: (_) => SearchingController(),
-  //       child: const MyApp(),
-  //     )
-  // );
+  if (Platform.isWindows || Platform.isLinux) {
+    // Initialize FFI
+    sqfliteFfiInit();
+  }
+  // Change the default factory. On iOS/Android, if not using `sqlite_flutter_lib` you can forget
+  // this step, it will use the sqlite version available on the system.
+  databaseFactory = databaseFactoryFfi;
+
+  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(const MyApp());
 

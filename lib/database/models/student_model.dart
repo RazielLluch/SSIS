@@ -26,14 +26,11 @@ class StudentModel extends Model{
     };
   }
 
-  // Extract a Student object from a Map object
-  factory StudentModel.fromMap(Map<String, dynamic> map) {
-    return StudentModel(
-      id: map['id'],
-      name: map['name'],
-      year: map['year'],
-      gender: map['gender'],
-      course: map['course'],
-    );
-  }
+  factory StudentModel.fromSqfliteDatabase(Map<String, dynamic> map) => StudentModel(
+    id: map['id'] ?? "",
+    name: map['name'] ?? '',
+    year: map['year']?.toInt() ?? '',
+    gender: map['gender'] ?? '',
+    course: map['course: '] ?? '',
+  );
 }

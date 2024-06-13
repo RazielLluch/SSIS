@@ -23,8 +23,8 @@ class StudentsWidget extends StatefulWidget {
 class _StudentsWidgetState extends State<StudentsWidget> {
 
   StudentRepo sRepo = StudentRepo();
-  late List<List> tempData;
-  late Future<List<List>> repoData;
+  late List tempData;
+  late Future<List> repoData;
   int _selectedIndex = -1;
   String _selectedId = "";
 
@@ -279,7 +279,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     );
   }
 
-  ConstrainedBox tableElements(List<List<dynamic>> data) {
+  ConstrainedBox tableElements(List data) {
 
     if(data.isEmpty) {
       return ConstrainedBox(

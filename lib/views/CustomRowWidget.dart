@@ -6,7 +6,7 @@ import '../database/models/model.dart';
 import '../misc/scope.dart';
 
 class CustomRowWidget extends StatefulWidget {
-  final List<dynamic> data;
+  final dynamic data;
   final Function(int, String, Model) handleRowTap;
   final int selectedIndex;
   final int index;
@@ -19,10 +19,17 @@ class CustomRowWidget extends StatefulWidget {
 
 class _CustomRowWidgetState extends State<CustomRowWidget> {
 
-
+  late List data;
 
   @override
   Widget build(BuildContext context) {
+
+    if(widget.data is StudentModel) {
+      data = [widget.data.id, widget.data.name, widget.data.year, widget.data.gender, widget.data.course];
+    } else {
+      data = [widget.data.courseCode, widget.data.name];
+    }
+
     int _selectedIndex = widget.selectedIndex;
     int index = widget.index;
 

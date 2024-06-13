@@ -22,7 +22,7 @@ class CoursesWidget extends StatefulWidget {
 
 class _CoursesWidgetState extends State<CoursesWidget> {
 
-  late List<List> tempData;
+  late List tempData;
 
   int _selectedIndex = -1;
   String _selectedCourseCode = "";
@@ -98,7 +98,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
     print("new state");
 
-    Future<List<List>> repoData = searchingController1.getSearchResults(Scope.course);
+    Future<List> repoData = searchingController1.getSearchResults(Scope.course);
     return Container(
       height: 500,
       margin: const EdgeInsets.only(
@@ -206,7 +206,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
     );
   }
 
-  ConstrainedBox tableElements(List<List<dynamic>> data) {
+  ConstrainedBox tableElements(List data) {
 
     if(data.isEmpty) {
       return ConstrainedBox(
