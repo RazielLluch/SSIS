@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'package:new_ssis_2/database/course_db.dart';
 import 'package:new_ssis_2/handlers/searching_handler.dart';
 
 import '../database/models/student_model.dart';
@@ -17,14 +18,14 @@ class CourseValidator{
     SearchHandler searchHandler = SearchHandler();
 
     bool validCourseCode = false;
-    if(await searchHandler.searchCourseCode(courseCode: courseCode, exclude: exclude1)){
+    if(await CourseDB().validCourseCode(courseCode)){
       validCourseCode = true;
     }else{
       throw Exception("A course with that code already exists!");
     }
 
     bool validCourseName = false;
-    if(await searchHandler.searchCourseName(courseName: courseName, exclude: exclude2)){
+    if(await CourseDB().validCourseName(courseName)){
       validCourseName = true;
     }else{
       throw Exception("a course with that name already exists!");

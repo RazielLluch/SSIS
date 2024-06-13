@@ -145,4 +145,38 @@ class CourseDB {
 
     return courseCodes;
   }
+
+  Future<bool> validCourseCode(String courseCode)async{
+    final database = await SsisDatabase().database;
+    final coursesWithCode = await database.rawQuery(
+        '''
+      SELECT * FROM $tableName WHERE courseCode = ?
+      ''',
+        [courseCode]
+    );
+
+    List<CourseModel> data = coursesWithCode.map((course) => CourseModel.fromSqfliteDatabase(course)).toList();
+    if(data.isNotEmpty) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  Future<bool> validCourseName(String courseName)async{
+    final database = await SsisDatabase().database;
+    final coursesWithCode = await database.rawQuery(
+        '''
+      SELECT * FROM $tableName WHERE name = ?
+      ''',
+        [courseName]
+    );
+
+    List<CourseModel> data = coursesWithCode.map((course) => CourseModel.fromSqfliteDatabase(course)).toList();
+    if(data.isNotEmpty) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

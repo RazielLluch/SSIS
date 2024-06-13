@@ -2,6 +2,7 @@ import 'dart:core';
 import 'package:new_ssis_2/handlers/searching_handler.dart';
 
 import '../database/models/student_model.dart';
+import '../database/student_db.dart';
 import '../misc/scope.dart';
 
 class StudentValidator{
@@ -15,7 +16,7 @@ class StudentValidator{
     SearchHandler searchHandler = SearchHandler();
 
     bool validId = false;
-    if(await searchHandler.searchIds(id: studentId, exclude: exclude)) {
+    if(await StudentDB().validId(studentId)) {
       validId = true;
     } else {
       throw Exception("A student with that ID number already exists!");

@@ -78,8 +78,8 @@ class _AddButton extends State<AddButton> {
 
       try{
         if(widget.scope == Scope.student){
-          // StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2]);
-          // await studentValidator.validate();
+          StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2]);
+          await studentValidator.validate();
           _resetControllers();
 
           // await sRepo.updateCsv([data]);
@@ -94,9 +94,8 @@ class _AddButton extends State<AddButton> {
           
           print(data);
         }else{
-          // CourseValidator courseValidator = CourseValidator(courseCode: data[0],courseName:  data[1]);
-          //
-          // await courseValidator.validate();
+          CourseValidator courseValidator = CourseValidator(courseCode: data[0],courseName:  data[1]);
+          await courseValidator.validate();
           _resetControllers();
 
           // await cRepo.updateCsv([data]);

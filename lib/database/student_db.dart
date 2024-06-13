@@ -113,4 +113,22 @@ class StudentDB{
         [id]
     );
   }
+
+  Future<bool> validId(String id)async{
+    final database = await SsisDatabase().database;
+    final studentsWithId = await database.rawQuery(
+      '''
+      SELECT * FROM $tableName WHERE id = ?
+      ''',
+      [id]
+    );
+
+    List<StudentModel> data = studentsWithId.map((student) => StudentModel.fromSqfliteDatabase(student)).toList();
+    if(data.isNotEmpty) {
+      return false;
+    } else {
+      return true;
+    }
+
+  }
 }
