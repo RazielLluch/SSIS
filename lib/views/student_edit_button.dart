@@ -4,6 +4,7 @@ import 'package:new_ssis_2/handlers/student_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
+import '../database/student_db.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
@@ -95,17 +96,21 @@ class _StudentEditButton extends State<StudentEditButton>{
       data[4] = "Not enrolled";
     }
 
-
     try{
-        StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2], exclude: widget.studentData.id);
-        await studentValidator.validate();
+        // StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2], exclude: widget.studentData.id);
+        // await studentValidator.validate();
         _resetControllers();
 
-        int index = await searchHandler.searchIndexById(data[0], Scope.student);
+        String? newId;
+        if(data[0] == widget.studentData.id) {
+          newId = null;
+        } else {
+          newId = data[0];
+        }
 
-        sRepo.editCsv(index, data);
-        await searchingController.searchResult(
-            searchHandler.searchItem("", Scope.student), Scope.student);
+        StudentDB().update(id: widget.studentData.id, newId: newId, name: data[1], year: int.parse(data[2]), gender: data[3], course: data[4]);
+
+        await searchingController.defaultStudentSearch();
 
         print(data);
     }catch (e, stackTrace){
@@ -113,13 +118,6 @@ class _StudentEditButton extends State<StudentEditButton>{
       throw Exception(e.toString());
     }
 
-    // int index = await searchHandler.searchIndexById(widget.studentData.id, Scope.student);
-    // print("the index of the student to edit is $index");
-    //
-    // await sRepo.editCsv(index, data);
-    // searchingController.defaultStudentSearch();
-    //
-    // print(data);
   }
 
   //this function is only used in the scope of a student
@@ -326,6 +324,8 @@ class _StudentEditButton extends State<StudentEditButton>{
 
                   String errorText = e.toString();
                   errorText = errorText.replaceAll("Exception: Exception: ", "");
+
+                  print(errorText);
 
                   _showErrorDialog(context, errorText);
                 }

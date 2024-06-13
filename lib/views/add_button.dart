@@ -5,6 +5,8 @@ import 'package:new_ssis_2/handlers/student_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
+import '../database/course_db.dart';
+import '../database/student_db.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
@@ -76,27 +78,35 @@ class _AddButton extends State<AddButton> {
 
       try{
         if(widget.scope == Scope.student){
-          StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2]);
-          await studentValidator.validate();
+          // StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2]);
+          // await studentValidator.validate();
           _resetControllers();
 
-          await sRepo.updateCsv([data]);
+          // await sRepo.updateCsv([data]);
 
-          await searchingController.searchResult(
-              searchHandler.searchItem("", Scope.student), Scope.student);
+          await StudentDB().create(id: data[0], name: data[1], year: int.parse(data[2]), gender: data[3], course: data[4]);
 
 
+          // await searchingController.searchResult(
+          //     searchHandler.searchItem("", Scope.student), Scope.student);
+
+          await searchingController.defaultStudentSearch();
           
           print(data);
         }else{
-          CourseValidator courseValidator = CourseValidator(courseCode: data[0],courseName:  data[1]);
-
-          await courseValidator.validate();
+          // CourseValidator courseValidator = CourseValidator(courseCode: data[0],courseName:  data[1]);
+          //
+          // await courseValidator.validate();
           _resetControllers();
 
-          await cRepo.updateCsv([data]);
-          await searchingController.searchResult(
-              searchHandler.searchItem("", Scope.course), Scope.course);
+          // await cRepo.updateCsv([data]);
+
+          await CourseDB().create(courseCode: data[0], name: data[1]);
+
+          // await searchingController.searchResult(
+          //     searchHandler.searchItem("", Scope.course), Scope.course);
+
+          await searchingController.defaultCourseSearch();
 
           print("printing course data: $data");
         }

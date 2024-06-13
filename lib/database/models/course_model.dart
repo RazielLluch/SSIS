@@ -9,7 +9,7 @@ class CourseModel extends Model{
   // Convert a Course object into a Map object
   Map<String, dynamic> toMap() {
     return {
-      'course_code': courseCode,
+      'courseCode': courseCode,
       'name': name,
     };
   }

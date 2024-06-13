@@ -98,7 +98,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
     print("new state");
 
-    Future<List> repoData = searchingController1.getSearchResults(Scope.course);
+    Future<List> repoData = searchingController1.getCourseSearchResults();
     return Container(
       height: 500,
       margin: const EdgeInsets.only(

@@ -34,6 +34,10 @@ class SearchingController extends ChangeNotifier{
     }
   }
 
+  Future<List<CourseModel>> getCourseSearchResults() async{
+    return _courseSearchResults;
+  }
+
   Future<void> defaultStudentSearch()async{
 
     _studentSearchResults = await StudentDB().fetchBySearch("");

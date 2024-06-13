@@ -44,18 +44,18 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
 
     int length;
     if(widget.scope == Scope.student){
-      model = StudentModel(id: widget.data[0].toString(), name: widget.data[1].toString(), year: widget.data[2], gender: widget.data[3].toString(), course: widget.data[4].toString());
+      model = StudentModel(id: data[0].toString(), name: data[1].toString(), year: data[2], gender: data[3].toString(), course: data[4].toString());
       widths = [120, 300, 80, 117.4, 120];
       length = 5;
     }else{
-      model = CourseModel(courseCode: widget.data[0], name: widget.data[1]);
+      model = CourseModel(courseCode: data[0], name: data[1]);
       widths = [120, 326.6];
       length = 2;
     }
 
         return GestureDetector(
           onTap: () {
-            widget.handleRowTap(widget.index, widget.data[0].toString(), model);
+            widget.handleRowTap(widget.index, data[0].toString(), model);
           },
           child: Container(
             padding: const EdgeInsets.only(bottom: 5),
@@ -66,7 +66,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
                   return _buildScrollableCell(
                     context,
                     width: widths[listIndex],
-                    content: widget.data[listIndex].toString(),
+                    content: data[listIndex].toString(),
                     isSelected: _selectedIndex == index,
                     hPadding: hPadding,
                     vPadding: vPadding,
@@ -77,7 +77,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
                   return _buildScrollableCell(
                     context,
                     width: 120,
-                    content: widget.data[listIndex].toString(),
+                    content: data[listIndex].toString(),
                     isSelected: _selectedIndex == index,
                     hPadding: hPadding,
                     vPadding: vPadding,
@@ -88,7 +88,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
                   return _buildCell(
                     context,
                     width: widths[listIndex],
-                    content: widget.data[listIndex].toString(),
+                    content: data[listIndex].toString(),
                     isSelected: _selectedIndex == index,
                     hPadding: hPadding,
                     vPadding: vPadding,

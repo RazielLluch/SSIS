@@ -48,28 +48,58 @@ class StudentDB{
     return StudentModel.fromSqfliteDatabase(student.first);
   }
 
-  Future<List<StudentModel>> fetchBySearch(String searchQuery) async{
+  Future<List<StudentModel>> fetchBySearch(String searchQuery) async {
     final database = await SsisDatabase().database;
-    final students = await database.rawQuery(
-        '''SELECT * FROM $tableName WHERE id LIKE "%$searchQuery%" OR name LIKE "%$searchQuery%" OR year LIKE $searchQuery OR gender = "%$searchQuery%" OR course = "%$searchQuery%"'''
-    );
-    return students.map((course) => StudentModel.fromSqfliteDatabase(course)).toList();
+    final students = await database.rawQuery('''
+      SELECT * FROM $tableName 
+      WHERE id LIKE '%$searchQuery%' 
+         OR name LIKE '%$searchQuery%' 
+         OR year LIKE '%$searchQuery%' 
+         OR gender LIKE '%$searchQuery%' 
+         OR course LIKE '%$searchQuery%'
+    ''');
+    return students.map((student) => StudentModel.fromSqfliteDatabase(student)).toList();
   }
 
-  Future<int> update({required String id, required String name, int? year, required String gender, String? course}) async{
+  Future<void> update({
+    required String id,
+    String? newId,
+    required String name,
+    int? year,
+    required String gender,
+    String? course,
+  }) async {
     final database = await SsisDatabase().database;
-    return await database.update(
+
+    if (newId != null) {
+      // Perform update by inserting a new row and deleting the old one
+      await database.transaction((txn) async {
+        // Insert new row
+        await txn.rawInsert('''
+          INSERT INTO $tableName (id, name, year, gender, course)
+          VALUES (?, ?, ?, ?, ?)
+        ''', [newId, name, year, gender, course]);
+
+        // Delete old row
+        await txn.rawDelete('''
+          DELETE FROM $tableName WHERE id = ?
+        ''', [id]);
+      });
+    } else {
+      // Perform direct update with parameterized query
+      await database.update(
         tableName,
         {
           'name': name,
-          if(year != null) 'year': year,
+          if (year != null) 'year': year,
           'gender': gender,
-          if(course != null) 'course': null
+          if (course != null) 'course': course,
         },
         where: 'id = ?',
-        conflictAlgorithm: ConflictAlgorithm.rollback,
-        whereArgs: [id]
-    );
+        whereArgs: [id],
+        conflictAlgorithm: ConflictAlgorithm.rollback, // Optional conflict algorithm
+      );
+    }
   }
 
   Future<void> delete(String id)async{

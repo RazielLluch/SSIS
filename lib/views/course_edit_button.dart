@@ -5,6 +5,7 @@ import 'package:new_ssis_2/handlers/course_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
+import '../database/course_db.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
@@ -73,29 +74,42 @@ class _CourseEditButton extends State<CourseEditButton>{
 
 
     try{
-      CourseValidator courseValidator = CourseValidator(courseCode: data[0], courseName: data[1], exclude1: widget.courseData.courseCode, exclude2: widget.courseData.name);
-      await courseValidator.validate();
+      // CourseValidator courseValidator = CourseValidator(courseCode: data[0], courseName: data[1], exclude1: widget.courseData.courseCode, exclude2: widget.courseData.name);
+      // await courseValidator.validate();
 
       cRepo = CourseRepo();
 
       String courseCode = widget.courseData.courseCode;
 
-      int index = await searchHandler.searchIndexById(widget.courseData.courseCode, Scope.course);
-      print("the index of the course to edit is $index");
+      // int index = await searchHandler.searchIndexById(widget.courseData.courseCode, Scope.course);
+      // print("the index of the course to edit is $index");
 
-      await cRepo.editCsv(index, data);
-
-      List<int> studentIndexes = await searchHandler.searchItemIndexes(courseCode, Scope.student);
-      print("these are the students to edit: $studentIndexes");
-      StudentRepo sRepo = StudentRepo();
-
-      for(int studentIndex in studentIndexes){
-        List student = await searchHandler.searchItemByIndex(studentIndex, Scope.student);
-        student[4] = data[0];
-        await sRepo.editCsv(studentIndex, student);
+      // await cRepo.editCsv(index, data);\
+      String? newCourseCode;
+      if(data[0] == widget.courseData.courseCode) {
+        newCourseCode =null;
+      } else {
+        newCourseCode = data[0];
       }
 
-      await searchingController.initialize();
+      await CourseDB().update(courseCode: courseCode, newCourseCode: data[0], name: data[1]);
+
+      // List<int> studentIndexes = await searchHandler.searchItemIndexes(courseCode, Scope.student);
+      // print("these are the students to edit: $studentIndexes");
+      // StudentRepo sRepo = StudentRepo();
+      //
+      // for(int studentIndex in studentIndexes){
+      //   List student = await searchHandler.searchItemByIndex(studentIndex, Scope.student);
+      //   student[4] = data[0];
+      //   await sRepo.editCsv(studentIndex, student);
+      // }
+
+      await searchingController.defaultCourseSearch();
+
+      _resetControllers();
+      callback();
+      Navigator.pop(context);
+
       print(data);
     }catch (e, stackTrace){
       print(stackTrace);
@@ -164,12 +178,6 @@ class _CourseEditButton extends State<CourseEditButton>{
                 try{
                   print("trying edit info");
                   await _editInfo(data);
-                  print("tried edit into");
-
-
-                  _resetControllers();
-                  callback();
-                  Navigator.pop(context);
 
                 }catch (e, stackTrace){
                   print("showing error dialog");

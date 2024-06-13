@@ -26,8 +26,8 @@ class CourseDB {
     FOR EACH ROW
     BEGIN
       UPDATE Students
-      SET course_id = 'not enrolled'
-      WHERE course_id = OLD.courseCode;
+      SET course = 'not enrolled'
+      WHERE course = OLD.courseCode;
     END;
     """);
   }
@@ -35,47 +35,73 @@ class CourseDB {
   Future<int> create({required String courseCode, required String name}) async {
     final database = await SsisDatabase().database;
     return await database.rawInsert(
-        ''' INSERT INTO $tableName (courseCode, name) VALUES (?,?)''',
+        '''INSERT INTO $tableName (courseCode, name) VALUES (?,?)''',
         [courseCode, name]
     );
   }
 
   Future<List<CourseModel>> fetchAll() async {
     final database = await SsisDatabase().database;
-    final courses = await database.rawQuery(
-        '''SELECT * FROM $tableName'''
-    );
+    final courses = await database.rawQuery('SELECT * FROM $tableName');
     return courses.map((course) => CourseModel.fromSqfliteDatabase(course)).toList();
   }
 
   Future<CourseModel> fetchById(String courseCode) async {
     final database = await SsisDatabase().database;
-    final course = await database.rawQuery(
-        '''SELECT * FROM $tableName WHERE courseCode = ?''',
-        [courseCode]
-    );
-    return CourseModel.fromSqfliteDatabase(course.first);
+    final course = await database.rawQuery('SELECT * FROM $tableName WHERE courseCode = ?', [courseCode]);
+    if (course.isNotEmpty) {
+      return CourseModel.fromSqfliteDatabase(course.first);
+    } else {
+      throw Exception('Course not found');
+    }
   }
 
-  Future<List<CourseModel>> fetchBySearch(String searchQuery) async{
+  Future<List<CourseModel>> fetchBySearch(String searchQuery) async {
     final database = await SsisDatabase().database;
     final courses = await database.rawQuery(
-      '''SELECT * FROM $tableName WHERE courseCode LIKE "%$searchQuery%" OR name LIKE "%$searchQuery%"'''
+        '''
+      SELECT * FROM $tableName 
+      WHERE courseCode LIKE ? 
+         OR name LIKE ?
+      ''',
+        ['%$searchQuery%', '%$searchQuery%']
     );
     return courses.map((course) => CourseModel.fromSqfliteDatabase(course)).toList();
   }
 
-  Future<int> update({required String courseCode, String? name}) async {
+  Future<void> update({
+    required String courseCode,
+    String? newCourseCode,
+    required String name,
+  }) async {
     final database = await SsisDatabase().database;
-    return await database.update(
+
+    if (newCourseCode != null) {
+      // Perform update by inserting a new row and deleting the old one
+      await database.transaction((txn) async {
+        // Insert new row
+        await txn.rawInsert('''
+          INSERT INTO $tableName (courseCode, name)
+          VALUES (?, ?)
+        ''', [newCourseCode, name]);
+
+        // Delete old row
+        await txn.rawDelete('''
+          DELETE FROM $tableName WHERE courseCode = ?
+        ''', [courseCode]);
+      });
+    } else {
+      // Perform direct update with parameterized query
+      await database.update(
         tableName,
         {
-          if (name != null) 'name': name,
+          'name': name,
         },
         where: 'courseCode = ?',
-        conflictAlgorithm: ConflictAlgorithm.rollback,
-        whereArgs: [courseCode]
-    );
+        whereArgs: [courseCode],
+        conflictAlgorithm: ConflictAlgorithm.rollback, // Optional conflict algorithm
+      );
+    }
   }
 
   Future<void> delete(String courseCode) async {
