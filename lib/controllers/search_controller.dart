@@ -53,6 +53,17 @@ class SearchingController extends ChangeNotifier{
     notifyListeners();
   }
 
+  Future<void> search(String searchQuery, Scope scope) async{
+    if(scope == Scope.student){
+      _studentSearchResults = await StudentDB().fetchBySearch(searchQuery);
+      notifyListeners();
+    }else {
+      _courseSearchResults = await CourseDB().fetchBySearch(searchQuery);
+      notifyListeners();
+    }
+
+  }
+
 
   Future<void> searchResult(Future<List<List<dynamic>>> value, Scope scope) async{
     List<List> values = await value;

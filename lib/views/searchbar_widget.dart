@@ -28,7 +28,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   }
 
   void _search(String query) async{
-    await searchingController.searchResult(searchHandler.searchItem(query, searchScope!), searchScope!);
+    await searchingController.search(query, searchScope!);
     setState(() {
       print("searching \"$query\" in $searchScope");
     });
