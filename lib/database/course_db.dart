@@ -86,6 +86,16 @@ class CourseDB {
           DELETE FROM $tableName WHERE courseCode = ?
         ''', [courseCode]);
 
+        //update student
+        await txn.rawQuery(
+          '''
+          UPDATE Students
+          SET course = ?
+          WHERE course = ?
+          ''',
+          [newCourseCode, courseCode]
+        );
+
         // Insert new row
         await txn.rawInsert('''
           INSERT INTO $tableName (courseCode, name)
@@ -110,6 +120,16 @@ class CourseDB {
     final database = await SsisDatabase().database;
     await database.rawDelete(
         '''DELETE FROM $tableName WHERE courseCode = ?''',
+        [courseCode]
+    );
+
+    //update student
+    await database.rawQuery(
+        '''
+          UPDATE Students
+          SET course = 'not enrolled'
+          WHERE course = ?
+          ''',
         [courseCode]
     );
   }

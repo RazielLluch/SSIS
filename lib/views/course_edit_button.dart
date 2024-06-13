@@ -105,6 +105,7 @@ class _CourseEditButton extends State<CourseEditButton>{
       // }
 
       await searchingController.defaultCourseSearch();
+      await searchingController.defaultStudentSearch();
 
       _resetControllers();
       callback();

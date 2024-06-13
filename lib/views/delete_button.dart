@@ -79,6 +79,7 @@ class _DeleteButton extends State<DeleteButton>{
 
       await CourseDB().delete(widget.primaryKey);
       searchingController.defaultCourseSearch();
+      searchingController.defaultStudentSearch();
 
     }
 
