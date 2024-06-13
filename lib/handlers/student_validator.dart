@@ -16,10 +16,12 @@ class StudentValidator{
     SearchHandler searchHandler = SearchHandler();
 
     bool validId = false;
-    if(await StudentDB().validId(studentId)) {
-      validId = true;
-    } else {
-      throw Exception("A student with that ID number already exists!");
+    if(studentId != exclude){
+      if (await StudentDB().validId(studentId)) {
+        validId = true;
+      } else {
+        throw Exception("A student with that ID number already exists!");
+      }
     }
 
     bool validYear;

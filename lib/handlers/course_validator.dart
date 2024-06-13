@@ -18,17 +18,21 @@ class CourseValidator{
     SearchHandler searchHandler = SearchHandler();
 
     bool validCourseCode = false;
-    if(await CourseDB().validCourseCode(courseCode)){
-      validCourseCode = true;
-    }else{
-      throw Exception("A course with that code already exists!");
+    if(courseCode != exclude1){
+      if (await CourseDB().validCourseCode(courseCode)) {
+        validCourseCode = true;
+      } else {
+        throw Exception("A course with that code already exists!");
+      }
     }
 
     bool validCourseName = false;
-    if(await CourseDB().validCourseName(courseName)){
-      validCourseName = true;
-    }else{
-      throw Exception("a course with that name already exists!");
+    if(courseName != exclude2){
+      if (await CourseDB().validCourseName(courseName)) {
+        validCourseName = true;
+      } else {
+        throw Exception("a course with that name already exists!");
+      }
     }
 
     print("successful course validation");

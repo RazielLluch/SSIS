@@ -74,8 +74,8 @@ class _CourseEditButton extends State<CourseEditButton>{
 
 
     try{
-      // CourseValidator courseValidator = CourseValidator(courseCode: data[0], courseName: data[1], exclude1: widget.courseData.courseCode, exclude2: widget.courseData.name);
-      // await courseValidator.validate();
+      CourseValidator courseValidator = CourseValidator(courseCode: data[0], courseName: data[1], exclude1: widget.courseData.courseCode, exclude2: widget.courseData.name);
+      await courseValidator.validate();
 
       cRepo = CourseRepo();
 
