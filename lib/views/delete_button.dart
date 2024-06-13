@@ -3,7 +3,9 @@ import 'package:new_ssis_2/controllers/search_controller.dart';
 import 'package:new_ssis_2/database/models/course_model.dart';
 import 'package:new_ssis_2/database/models/student_model.dart';
 import 'package:provider/provider.dart';
+import '../database/course_db.dart';
 import '../database/models/model.dart';
+import '../database/student_db.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
@@ -11,9 +13,10 @@ import '../repository/student_repo.dart';
 
 class DeleteButton extends StatefulWidget{
   final int index;
+  final String primaryKey;
   final VoidCallback callback;
   final Scope scope;
-  const DeleteButton({super.key, required this.index, required this.scope, required this.callback});
+  const DeleteButton({super.key, required this.index, required this.primaryKey, required this.scope, required this.callback});
 
   @override
   State<DeleteButton> createState() => _DeleteButton();
@@ -49,26 +52,33 @@ class _DeleteButton extends State<DeleteButton>{
   void _deleteInfo()async{
 
     if(widget.scope == Scope.student){
-      await sRepo.deleteCsv(widget.index+1);
-      searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
+      // await sRepo.deleteCsv(widget.index+1);
+      // searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
+
+      await StudentDB().delete(widget.primaryKey);
+      searchingController.defaultStudentSearch();
+
     }else{
-      SearchHandler searchHandler = SearchHandler();
-      List courseCodes = await cRepo.listPrimaryKeys();
-      String courseCode = courseCodes[widget.index+1];
+      // SearchHandler searchHandler = SearchHandler();
+      // List courseCodes = await cRepo.listPrimaryKeys();
+      // String courseCode = courseCodes[widget.index+1];
+      //
+      // print("selected course code: $courseCode");
+      //
+      // List enrolledStudents = await searchHandler.searchItemIndexes(courseCode, Scope.student);
+      //
+      // for(int i = 0; i < enrolledStudents.length; i++){
+      //   List<List> editList = await sRepo.getList();
+      //   List currentData = editList[enrolledStudents[i]];
+      //   currentData[4] = "Not enrolled";
+      //   await sRepo.editCsv(enrolledStudents[i], currentData);
+      //   searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
+      // }
+      //
+      // await cRepo.deleteCsv(widget.index+1);
 
-      print("selected course code: $courseCode");
-
-      List enrolledStudents = await searchHandler.searchItemIndexes(courseCode, Scope.student);
-
-      for(int i = 0; i < enrolledStudents.length; i++){
-        List<List> editList = await sRepo.getList();
-        List currentData = editList[enrolledStudents[i]];
-        currentData[4] = "Not enrolled";
-        await sRepo.editCsv(enrolledStudents[i], currentData);
-        searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
-      }
-
-      await cRepo.deleteCsv(widget.index+1);
+      await CourseDB().delete(widget.primaryKey);
+      searchingController.defaultCourseSearch();
 
     }
 

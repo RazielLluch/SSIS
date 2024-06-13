@@ -119,7 +119,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
+                        DeleteButton(index: _selectedIndex, primaryKey: _selectedCourseCode, scope: Scope.course, callback: deleteCallback),
                         CourseEditButton(courseData: _selectedCourseModel,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.course)
                       ],
@@ -138,7 +138,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.course, callback: deleteCallback),
+                        DeleteButton(index: _selectedIndex, primaryKey: _selectedCourseCode, scope: Scope.course, callback: deleteCallback),
                         CourseEditButton(courseData: _selectedCourseModel,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.course)
                       ],

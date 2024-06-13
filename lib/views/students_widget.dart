@@ -129,7 +129,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
+                        DeleteButton(index: _selectedIndex, primaryKey: _selectedId, scope: Scope.student, callback: deleteCallback),
                         StudentEditButton(studentData: _selectedStudentModel!,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
@@ -148,7 +148,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     alignment: Alignment.centerRight,
                     child: Row(
                       children: [
-                        DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
+                        DeleteButton(index: _selectedIndex, primaryKey: _selectedId, scope: Scope.student, callback: deleteCallback),
                         StudentEditButton(studentData: _selectedStudentModel!, callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],

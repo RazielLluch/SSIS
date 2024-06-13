@@ -81,16 +81,16 @@ class CourseDB {
     if (newCourseCode != null) {
       // Perform update by inserting a new row and deleting the old one
       await database.transaction((txn) async {
+        // Delete old row
+        await txn.rawDelete('''
+          DELETE FROM $tableName WHERE courseCode = ?
+        ''', [courseCode]);
+
         // Insert new row
         await txn.rawInsert('''
           INSERT INTO $tableName (courseCode, name)
           VALUES (?, ?)
         ''', [newCourseCode, name]);
-
-        // Delete old row
-        await txn.rawDelete('''
-          DELETE FROM $tableName WHERE courseCode = ?
-        ''', [courseCode]);
       });
     } else {
       // Perform direct update with parameterized query
@@ -112,5 +112,17 @@ class CourseDB {
         '''DELETE FROM $tableName WHERE courseCode = ?''',
         [courseCode]
     );
+  }
+
+  Future<List<String>> fetchAllCourseCodes() async {
+    final database = await SsisDatabase().database;
+    final List<Map<String, dynamic>> results = await database.rawQuery('''
+      SELECT courseCode FROM $tableName
+    ''');
+
+    // Extracting the courseCode values from the results
+    List<String> courseCodes = results.map((row) => row['courseCode'] as String).toList();
+
+    return courseCodes;
   }
 }

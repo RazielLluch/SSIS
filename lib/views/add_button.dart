@@ -321,7 +321,7 @@ class _AddButton extends State<AddButton> {
     }
 
     sRepo = StudentRepo();
-    courseKeys = cRepo.listPrimaryKeys();
+    courseKeys = CourseDB().fetchAllCourseCodes();
     data = sRepo.getList();
 
     return FloatingActionButton(
