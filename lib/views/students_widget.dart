@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
 import 'package:new_ssis_2/repository/student_repo.dart';
+import 'package:new_ssis_2/views/CustomRowWidget.dart';
 import 'package:new_ssis_2/views/delete_button.dart';
 import 'package:provider/provider.dart';
 
+import '../database/models/model.dart';
+import '../database/models/student_model.dart';
 import '../misc/scope.dart';
 import 'add_button.dart';
-import 'edit_button.dart';
+import 'student_edit_button.dart';
 
 class StudentsWidget extends StatefulWidget {
   final VoidCallback callback;
@@ -23,6 +26,9 @@ class _StudentsWidgetState extends State<StudentsWidget> {
   late List<List> tempData;
   late Future<List<List>> repoData;
   int _selectedIndex = -1;
+  String _selectedId = "";
+
+  late StudentModel? _selectedStudentModel = StudentModel(id: '', name: '', gender: '=');
 
 /*  @override
   void initState() {
@@ -30,10 +36,14 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     super.initState();
   }*/
 
-  void callback(){
+  void editCallback(int index, StudentModel studentModel){
     print("students callback");
     setState(() {
       print("students callback 2");
+
+      _selectedIndex = index;
+      _selectedStudentModel = studentModel;
+
       widget.callback();
     });
   }
@@ -42,8 +52,12 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     print("students callback");
     setState(() {
       print("students callback 2");
+
+      _selectedIndex = -1;
+      _selectedStudentModel = StudentModel(id: '', name: '', gender: '');
+
+
       widget.callback();
-      _selectedIndex--;
     });
   }
 
@@ -51,20 +65,32 @@ class _StudentsWidgetState extends State<StudentsWidget> {
     print("students callback");
     setState(() {
       print("students callback 2");
+
+      _selectedIndex = -1;
+      _selectedStudentModel = StudentModel(id: '', name: '', gender: '');
+
       widget.callback();
-      _selectedIndex = tempData.length;
     });
   }
 
 
-  void _handleRowTap(int index) {
+  void _handleRowTap(int index, String id, Model studentModel) {
     setState(() {
       print("preselected index is: $_selectedIndex");
-      if(index == _selectedIndex) {
+      if(id == _selectedId) {
         _selectedIndex = -1;
+        _selectedId = "";
+        _selectedStudentModel = StudentModel(id: '', name: '', gender: '=');
       }
       else  {
         _selectedIndex = index;
+        _selectedId = id;
+        if(studentModel is StudentModel){
+          _selectedStudentModel = studentModel;
+        }
+        else{
+          throw ArgumentError('Expected a StudentModel, but got ${studentModel.runtimeType}');
+        }
       }
       print("postselected index is: $_selectedIndex");
     });
@@ -88,14 +114,6 @@ class _StudentsWidgetState extends State<StudentsWidget> {
         right: 7,
         bottom: 15,
       ),
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 1.2,
-          color: Colors.white,
-          style: BorderStyle.solid,
-        ),
-        borderRadius: const BorderRadius.all(Radius.circular(15)),
-      ),
       child: FutureBuilder(
         future: repoData,
         builder: (context, snapshot){
@@ -111,7 +129,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
-                        EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
+                        StudentEditButton(studentData: _selectedStudentModel!,callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )
@@ -130,7 +148,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, scope: Scope.student, callback: deleteCallback),
-                        EditButton(data: snapshot.data!, index: _selectedIndex, callback: callback, scope: Scope.student),
+                        StudentEditButton(studentData: _selectedStudentModel!, callback: editCallback),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )
@@ -146,8 +164,10 @@ class _StudentsWidgetState extends State<StudentsWidget> {
 
 
   Container tableHeader(){
+
+    Color headerColor = const Color(0xffE8E8E8);
+
     return Container(
-      // color: Colors.lightBlueAccent.shade700,
       padding: const EdgeInsets.only(top: 5, right: 5, bottom: 5),
       child: Row(
           children: [
@@ -156,6 +176,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                 margin: const EdgeInsets.only(right: 5),
                 padding: const EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -176,6 +197,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                 padding: const EdgeInsets.only(right: 5),
                 margin: const EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -196,6 +218,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                 margin: const EdgeInsets.only(right: 5),
                 padding: const EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -216,6 +239,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                 margin: const EdgeInsets.only(right: 5),
                 padding: const EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -234,6 +258,7 @@ class _StudentsWidgetState extends State<StudentsWidget> {
             Container(
                 width: 120,
                 decoration: BoxDecoration(
+                    color: headerColor,
                     border: Border.all(
                         width: 1.2,
                         color: Colors.grey,
@@ -270,153 +295,10 @@ class _StudentsWidgetState extends State<StudentsWidget> {
         maxHeight: MediaQuery.of(context).size.height * 0.5845, // Adjust the value as needed
       ),
       child: SingleChildScrollView(
-      scrollDirection: Axis.vertical,
+        scrollDirection: Axis.vertical,
         child: Column(
-          children: List<GestureDetector>.generate(data.length, (index) {
-
-            double hPadding = 20;
-            double vPadding = 5;
-            double inset = 5;
-
-            return GestureDetector(
-              onTap: (){
-                _handleRowTap(index);
-              },
-              child: Container(
-                padding: const EdgeInsets.only(right: 5, bottom: 5),
-                child: Row(
-                    children: [
-                      Container(
-                          width: 120,
-                          margin: EdgeInsets.only(right: inset),
-                          padding: EdgeInsets.only(right: inset),
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                                  ? Colors.lightBlueAccent.withOpacity(0.5)
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            alignment: Alignment.center,
-                            child: Text(
-                                data[index][0].toString()
-                            ),
-                          )
-                      ),
-                      Container(
-                          width: 300,
-                          margin: EdgeInsets.only(right: inset),
-                          padding: EdgeInsets.only(right: inset),
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                                  ? Colors.lightBlueAccent.withOpacity(0.5)
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width,
-                              ),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                    data[index][1].toString()
-                                ),
-                              ),
-                            ),
-                          )
-                      ),
-                      Container(
-                          width: 80,
-                          margin: EdgeInsets.only(right: inset),
-                          padding: EdgeInsets.only(right: inset),
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                                  ? Colors.lightBlueAccent.withOpacity(0.5)
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            alignment: Alignment.center,
-                            child: Text(
-                                data[index][2].toString()
-                            ),
-                          )
-                      ),
-                      Container(
-                          width: 120,
-                          margin: EdgeInsets.only(right: inset),
-                          padding: EdgeInsets.only(right: inset),
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                                  ? Colors.lightBlueAccent.withOpacity(0.5)
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(top: vPadding, bottom: vPadding, left: hPadding, right: hPadding),
-                            alignment: Alignment.center,
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width,
-                              ),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                    data[index][3].toString()
-                                ),
-                              ),
-                            ),
-                          )
-                      ),
-                      Container(
-                          width: 120,
-                          decoration: BoxDecoration(
-                              color: _selectedIndex == index
-                              ? Colors.lightBlueAccent.withOpacity(0.5)
-                              : Colors.transparent,
-                              border: Border.all(
-                                  width: 1.2,
-                                  color: Colors.grey,
-                                  style: BorderStyle.solid
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(15))
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.only(left: hPadding, top: vPadding, bottom: vPadding),
-                            child: Text(
-                                data[index][4].toString()
-                            ),
-                          )
-                      ),
-                    ]
-                ),
-              ),
-            );
+          children: List<CustomRowWidget>.generate(data.length, (index) {
+            return CustomRowWidget(data: data[index], index: index, selectedIndex: _selectedIndex, handleRowTap: _handleRowTap, scope: Scope.student);
           }),
         ),
       ),

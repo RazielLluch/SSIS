@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:new_ssis_2/controllers/search_controller.dart';
+import 'package:new_ssis_2/database/models/course_model.dart';
+import 'package:new_ssis_2/database/models/student_model.dart';
 import 'package:provider/provider.dart';
-
+import '../database/models/model.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
 import '../repository/student_repo.dart';
-
 
 class DeleteButton extends StatefulWidget{
   final int index;
@@ -36,7 +37,13 @@ class _DeleteButton extends State<DeleteButton>{
 
   void callback(){
     print("add callback");
-    widget.callback();
+
+    if(widget.scope == Scope.student){
+      widget.callback();
+    }else{
+      widget.callback();
+    }
+
   }
 
   void _deleteInfo()async{
@@ -77,9 +84,8 @@ class _DeleteButton extends State<DeleteButton>{
       scope = "Course";
     }
 
-
-
-    if(widget.index == -1){
+    if(widget.index < 0){
+      print("widget.index = ${widget.index}");
       return FloatingActionButton(
         onPressed:  null,
         backgroundColor: Colors.grey,
@@ -113,7 +119,6 @@ class _DeleteButton extends State<DeleteButton>{
                                       child: const Text("cancel"),
                                       onPressed: (){
                                         Navigator.pop(context);
-                                        widget.callback();
                                       },
                                     )
                                 ),
