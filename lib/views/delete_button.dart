@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:new_ssis_2/controllers/search_controller.dart';
+import 'package:new_ssis_2/database/models/course_model.dart';
+import 'package:new_ssis_2/database/models/student_model.dart';
+import 'package:provider/provider.dart';
+import '../database/models/model.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
 import '../repository/course_repo.dart';
 import '../repository/student_repo.dart';
-
 
 class DeleteButton extends StatefulWidget{
   final int index;
@@ -22,35 +25,54 @@ class _DeleteButton extends State<DeleteButton>{
   CourseRepo cRepo = CourseRepo();
 
   late StudentRepo sRepo = StudentRepo();
+  late SearchHandler searchHandler;
+  late SearchingController searchingController;
 
+  @override
+  void initState() {
+    searchHandler = SearchHandler();
+    searchingController = context.read<SearchingController>(); // Initialize the controller
+    super.initState();
+  }
+
+  void callback(){
+    print("add callback");
+
+    if(widget.scope == Scope.student){
+      widget.callback();
+    }else{
+      widget.callback();
+    }
+
+  }
 
   void _deleteInfo()async{
 
     if(widget.scope == Scope.student){
-      sRepo.deleteCsv(widget.index);
+      await sRepo.deleteCsv(widget.index+1);
+      searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
     }else{
       SearchHandler searchHandler = SearchHandler();
       List courseCodes = await cRepo.listPrimaryKeys();
-      String courseCode = courseCodes[widget.index];
+      String courseCode = courseCodes[widget.index+1];
 
-      List enrolledStudents = await searchHandler.searchItem(courseCode, Scope.student);
+      print("selected course code: $courseCode");
+
+      List enrolledStudents = await searchHandler.searchItemIndexes(courseCode, Scope.student);
 
       for(int i = 0; i < enrolledStudents.length; i++){
         List<List> editList = await sRepo.getList();
         List currentData = editList[enrolledStudents[i]];
         currentData[4] = "Not enrolled";
-        sRepo.editCsv(enrolledStudents[i], currentData);
+        await sRepo.editCsv(enrolledStudents[i], currentData);
+        searchingController.searchResult(searchHandler.searchItem("", Scope.student), Scope.student);
       }
 
-      cRepo.deleteCsv(widget.index);
+      await cRepo.deleteCsv(widget.index+1);
 
     }
 
-
-
-
-    setState((){
-    });
+    searchingController.searchResult(searchHandler.searchItem("", widget.scope), widget.scope);
   }
 
   @override
@@ -62,9 +84,8 @@ class _DeleteButton extends State<DeleteButton>{
       scope = "Course";
     }
 
-
-
-    if(widget.index == -1){
+    if(widget.index < 0){
+      print("widget.index = ${widget.index}");
       return FloatingActionButton(
         onPressed:  null,
         backgroundColor: Colors.grey,
@@ -98,7 +119,6 @@ class _DeleteButton extends State<DeleteButton>{
                                       child: const Text("cancel"),
                                       onPressed: (){
                                         Navigator.pop(context);
-                                        widget.callback();
                                       },
                                     )
                                 ),
@@ -109,7 +129,7 @@ class _DeleteButton extends State<DeleteButton>{
                                       onPressed: (){
                                         _deleteInfo();
                                         Navigator.pop(context);
-                                        widget.callback();
+                                        callback();
                                       },
                                     )
                                 )

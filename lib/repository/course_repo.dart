@@ -31,20 +31,17 @@ class CourseRepo{
 
   }
 
-  void editCsv(int index, List data)async{
-    FileHandler handler = FileHandler('courses');
-    handler.editCsv(index, data);
+  Future<void> editCsv(int index, List data)async{
+    await handler.editCsv(index, data);
 
   }
 
-  void deleteCsv(int index)async{
-    FileHandler handler = FileHandler('courses');
-    handler.deleteCsv(index);
+  Future<void> deleteCsv(int index)async{
+    await handler.deleteCsv(index);
   }
 
-  void updateCsv(List<List> data){
-    FileHandler handler = FileHandler('courses');
-    handler.appendCsv(data);
+  Future<void> updateCsv(List<List> data)async{
+    await handler.appendCsv(data);
   }
 
   Future<List> listPrimaryKeys()async{

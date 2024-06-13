@@ -17,7 +17,7 @@ void main() {
   //     )
   // );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 
   doWhenWindowReady(() {
     final window = appWindow;
@@ -60,7 +60,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   void callback(){
+    print("main callback");
     setState(() {
+      print("main callback 2");
       print("parent widget refreshed");
     });
   }
@@ -79,19 +81,20 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(
-              horizontal: 40.0,
-              vertical: 20.0
-          ),
-          alignment: Alignment.center,
-          child: Align(
-            alignment: FractionalOffset.topCenter,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  child: Align(
+      body: Container(
+        color: const Color(0xffEAEAEA),
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(
+                horizontal: 40.0,
+                vertical: 20.0
+            ),
+            alignment: Alignment.center,
+            child: Align(
+              alignment: FractionalOffset.topCenter,
+              child: Column(
+                children: <Widget>[
+                  Align(
                     alignment: FractionalOffset.topCenter,
                     child: ChangeNotifierProvider(
                       create: (_) => SearchingController(),
@@ -110,22 +113,22 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: const SearchBarWidget()
                           ),
                           // STUDENT AND COURSES WIDGETS
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              StudentsWidget(),
-                              CoursesWidget(),
+                              StudentsWidget(callback: callback),
+                              CoursesWidget(callback: callback),
                             ]
                           )
                         ],
                       ),
                     )
                   )
-                )
-              ]
+                ]
+              )
             )
           )
-        )
+        ),
       )
     );
   }
