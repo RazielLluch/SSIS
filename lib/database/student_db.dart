@@ -25,6 +25,7 @@ class StudentDB{
 
   Future<int> create({required String id, required String name, int? year, required String gender, String? course}) async{
     final database = await SsisDatabase().database;
+    if(course == '') course = "not enrolled";
     return await database.rawInsert(
       ''' INSERT INTO $tableName (id, name, year, gender, course) VALUES (?,?,?,?,?)''',
       [id, name, year, gender, course]

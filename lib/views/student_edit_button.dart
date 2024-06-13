@@ -4,6 +4,7 @@ import 'package:new_ssis_2/handlers/student_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/search_controller.dart';
+import '../database/course_db.dart';
 import '../database/student_db.dart';
 import '../handlers/searching_handler.dart';
 import '../misc/scope.dart';
@@ -33,8 +34,9 @@ class _StudentEditButton extends State<StudentEditButton>{
 
   final sCourseController = TextEditingController();
   final genderController = TextEditingController();
-  late dynamic _dropdownValue;
-  late dynamic _genderDropdownValue;
+
+  late String _courseDropdownValue = "Course";
+  late String _genderDropdownValue = "Gender";
 
   Scope scope = Scope.student;
 
@@ -70,10 +72,6 @@ class _StudentEditButton extends State<StudentEditButton>{
   }
 
   void _setControllers()async{
-    int length;
-
-    length = 4;
-
     controllers[0].text = widget.studentData.id.toString();
     controllers[1].text = widget.studentData.name.toString();
     controllers[2].text = widget.studentData.year.toString();
@@ -149,10 +147,10 @@ class _StudentEditButton extends State<StudentEditButton>{
     );
   }
 
-  FutureBuilder dropdownButtonBuilder(Future<List>? items){
-    return FutureBuilder(
+  FutureBuilder dropdownButtonBuilder(Future<List> items) {
+    return FutureBuilder<List>(
       future: items,
-      builder: (context, snapshot){
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
@@ -160,46 +158,34 @@ class _StudentEditButton extends State<StudentEditButton>{
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('No data available'));
         } else {
-
           List dropdownItems = snapshot.data!;
-
-          print(snapshot.data!);
-
-          if(widget.studentData.course == null || widget.studentData.course.toString() == "Not enrolled" || widget.studentData.course.toString().isEmpty){
-            _dropdownValue = snapshot.data![0];
-          }else{
-            _dropdownValue = widget.studentData.course;
+          if (!_courseDropdownValueExistsInItems(dropdownItems)) {
+            // If the current selected value is not in the list, set it to the first item
+            _courseDropdownValue = dropdownItems[0];
           }
 
-          print(_dropdownValue);
-
           return Expanded(
-              child: DropdownButton(
-                value: _dropdownValue,
-                items: dropdownItems.map((dynamic value) {
-
-                  String value2;
-
-                  if(value == "CourseCode"){
-                    value2 = "Not enrolled";
-                  }else{
-                    value2 = value;
-                  }
-
-                  return DropdownMenuItem(
-                    value: value,
-                    child: Container(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Text(value2)
-                    ),
-                  );
-                }).toList(),
-                onChanged: dropdownCallback,
-              )
+            child: DropdownButton<dynamic>(
+              value: _courseDropdownValue,
+              items: dropdownItems.map((dynamic value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(value),
+                  ),
+                );
+              }).toList(),
+              onChanged: dropdownCallback,
+            ),
           );
         }
       },
     );
+  }
+
+  bool _courseDropdownValueExistsInItems(List items) {
+    return items.contains(_courseDropdownValue);
   }
 
   genderDropdown(List genders) {
@@ -274,9 +260,6 @@ class _StudentEditButton extends State<StudentEditButton>{
       ),
     );
 
-
-    Future<List> courseKeys = cRepo.listPrimaryKeys();
-
     dialogElements.add(
       Container(
           decoration: BoxDecoration(
@@ -286,7 +269,7 @@ class _StudentEditButton extends State<StudentEditButton>{
           child: Row(
               children: [
                 dropdownButtonBuilder(
-                    courseKeys
+                    courseKeys!
                 )
               ]
           )
@@ -351,7 +334,7 @@ class _StudentEditButton extends State<StudentEditButton>{
   Widget build(BuildContext context){
 
     sRepo = StudentRepo();
-    courseKeys = cRepo.listPrimaryKeys();
+    courseKeys = CourseDB().fetchAllCourseCodes();
 
 
 
