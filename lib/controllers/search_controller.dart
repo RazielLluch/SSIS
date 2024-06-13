@@ -5,7 +5,6 @@ import 'package:new_ssis_2/database/models/student_model.dart';
 import 'package:new_ssis_2/handlers/searching_handler.dart';
 
 import '../database/course_db.dart';
-import '../database/models/model.dart';
 import '../misc/scope.dart';
 
 class SearchingController extends ChangeNotifier{
@@ -28,8 +27,10 @@ class SearchingController extends ChangeNotifier{
 
   Future<List<dynamic>> getSearchResults(Scope scope) async{
     if(scope == Scope.student) {
+      print("these are your search results: $_studentSearchResults");
       return _studentSearchResults;
     } else {
+      print("these are your search results: $_courseSearchResults");
       return _courseSearchResults;
     }
   }

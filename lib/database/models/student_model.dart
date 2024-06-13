@@ -26,11 +26,17 @@ class StudentModel extends Model{
     };
   }
 
+
+  @override
+  String toString() {
+    return 'StudentModel{id: $id, name: $name, year: $year, gender: $gender, course: $course}';
+  }
+
   factory StudentModel.fromSqfliteDatabase(Map<String, dynamic> map) => StudentModel(
     id: map['id'] ?? "",
     name: map['name'] ?? '',
     year: map['year']?.toInt() ?? '',
     gender: map['gender'] ?? '',
-    course: map['course: '] ?? '',
+    course: map['course'] ?? '',
   );
 }

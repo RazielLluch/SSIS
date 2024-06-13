@@ -56,9 +56,12 @@ class StudentDB{
          OR name LIKE '%$searchQuery%' 
          OR year LIKE '%$searchQuery%' 
          OR gender LIKE '%$searchQuery%' 
-         OR course LIKE '%$searchQuery%'
+         OR course LIKE '%$searchQuery%';
+      ORDER BY id ASC
     ''');
-    return students.map((student) => StudentModel.fromSqfliteDatabase(student)).toList();
+    List<StudentModel> data = students.map((student) => StudentModel.fromSqfliteDatabase(student)).toList();
+    print("this is your fetch by search data: $data");
+    return data;
   }
 
   Future<void> update({

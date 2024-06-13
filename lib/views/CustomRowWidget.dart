@@ -29,6 +29,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
     } else {
       data = [widget.data.courseCode, widget.data.name];
     }
+    print("your data is $data");
 
     int _selectedIndex = widget.selectedIndex;
     int index = widget.index;

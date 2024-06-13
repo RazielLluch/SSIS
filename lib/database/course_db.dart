@@ -63,6 +63,8 @@ class CourseDB {
       SELECT * FROM $tableName 
       WHERE courseCode LIKE ? 
          OR name LIKE ?
+         
+      ORDER BY courseCode ASC
       ''',
         ['%$searchQuery%', '%$searchQuery%']
     );

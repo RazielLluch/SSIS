@@ -14,7 +14,11 @@ class CourseModel extends Model{
     };
   }
 
-  // Extract a Course object from a Map object
+
+  @override
+  String toString() {
+    return 'CourseModel{courseCode: $courseCode, name: $name}';
+  } // Extract a Course object from a Map object
   factory CourseModel.fromSqfliteDatabase(Map<String, dynamic> map) => CourseModel(
     courseCode: map['courseCode'] ?? "",
     name: map['name'] ?? '',
