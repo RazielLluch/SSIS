@@ -55,15 +55,14 @@ class _CoursesWidgetState extends State<CoursesWidget> {
 
   void addCallback(){
     print("courses callback");
-
     setState(() {
       print("courses callback 2");
-      widget.callback();
+
 
       _selectedIndex = -1;
       _selectedCourseModel = CourseModel(courseCode: '', name: '');
 
-      _selectedIndex = tempData.length;
+      widget.callback();
     });
   }
 
