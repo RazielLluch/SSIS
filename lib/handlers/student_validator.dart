@@ -7,13 +7,14 @@ class StudentValidator{
   final String studentId;
   final String name;
   final String year;
-  final String? exclude;
-  StudentValidator({required this.studentId, required this.name, required this.year, this.exclude});
+  final String? exclude1;
+  final String? exclude2;
+  StudentValidator({required this.studentId, required this.name, required this.year, this.exclude1, this.exclude2});
 
   Future<void> validate() async{
 
     bool validId = false;
-    if(studentId != exclude){
+    if(studentId != exclude1){
       if (await checkIfIdIsValid(studentId) && await StudentDB().validId(studentId)) {
         validId = true;
       } else {
@@ -23,10 +24,12 @@ class StudentValidator{
 
     bool validName;
 
-    if(await StudentDB().validName(name)){
-      validName = true;
-    }else{
-      throw Exception('A student with this name already exists');
+    if(name != exclude2){
+      if (await StudentDB().validName(name)) {
+        validName = true;
+      } else {
+        throw Exception('A student with this name already exists');
+      }
     }
 
     bool validYear;
