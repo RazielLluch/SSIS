@@ -71,13 +71,13 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
                     isSelected: _selectedIndex == index,
                     hPadding: hPadding,
                     vPadding: vPadding,
-                    inset: inset,
+                    inset: listIndex == 1? 0 : inset,
                     alignment: listIndex == 1 ? Alignment.centerLeft : Alignment.center,
                   );
-                }else if(listIndex == 4){
+                }else if(listIndex == 1 || listIndex == 3 || listIndex == 4){
                   return _buildScrollableCell(
                     context,
-                    width: 120,
+                    width: widths[listIndex],
                     content: data[listIndex].toString(),
                     isSelected: _selectedIndex == index,
                     hPadding: hPadding,
@@ -140,7 +140,7 @@ class _CustomRowWidgetState extends State<CustomRowWidget> {
         required AlignmentGeometry alignment}) {
     return Container(
       width: width,
-      // margin: EdgeInsets.only(right: inset),
+      margin: EdgeInsets.only(right: inset),
       padding: EdgeInsets.only(right: inset),
       decoration: BoxDecoration(
         color: isSelected ? Colors.lightBlueAccent.withOpacity(0.5) : const Color(0xffEDEDED),
