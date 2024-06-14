@@ -95,7 +95,7 @@ class _StudentEditButton extends State<StudentEditButton>{
     }
 
     try{
-        StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2], exclude: widget.studentData.id);
+        StudentValidator studentValidator = StudentValidator(studentId: data[0], name: data[1], year: data[2], exclude: widget.studentData.id);
         await studentValidator.validate();
         _resetControllers();
 

@@ -78,17 +78,12 @@ class _AddButton extends State<AddButton> {
 
       try{
         if(widget.scope == Scope.student){
-          StudentValidator studentValidator = StudentValidator(studentId: data[0], year: data[2]);
+          StudentValidator studentValidator = StudentValidator(studentId: data[0], name: data[1], year: data[2]);
           await studentValidator.validate();
           _resetControllers();
 
-          // await sRepo.updateCsv([data]);
-
           await StudentDB().create(id: data[0], name: data[1], year: int.parse(data[2]), gender: data[3], course: data[4]);
 
-
-          // await searchingController.searchResult(
-          //     searchHandler.searchItem("", Scope.student), Scope.student);
 
           await searchingController.defaultStudentSearch();
           
@@ -215,16 +210,16 @@ class _AddButton extends State<AddButton> {
     List<String> columns;
     if (widget.scope == Scope.student) {
       height = 450;
-      columns = ["ID Number", "Name", "Year Level", "Gender", "Course Code"];
-      scope = "student";
+      columns = ['ID Number', 'Name', 'Year Level', 'Gender', 'Course Code'];
+      scope = 'student';
     } else {
       height = 270;
-      columns = ["Course Code", "Course Name"];
-      scope = "course";
+      columns = ['Course Code', 'Course Name'];
+      scope = 'course';
     }
 
     List<Widget> dialogElements = [
-      Text("Add $scope")
+      Text('Add $scope')
     ];
     int length;
     if (widget.scope == Scope.student) {

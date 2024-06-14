@@ -1,27 +1,32 @@
 import 'dart:core';
 import 'package:new_ssis_2/handlers/searching_handler.dart';
-
-import '../database/models/student_model.dart';
 import '../database/student_db.dart';
-import '../misc/scope.dart';
 
 class StudentValidator{
 
   final String studentId;
+  final String name;
   final String year;
   final String? exclude;
-  StudentValidator({required this.studentId, required this.year, this.exclude});
+  StudentValidator({required this.studentId, required this.name, required this.year, this.exclude});
 
   Future<void> validate() async{
-    SearchHandler searchHandler = SearchHandler();
 
     bool validId = false;
     if(studentId != exclude){
-      if (await StudentDB().validId(studentId)) {
+      if (await checkIfIdIsValid(studentId) && await StudentDB().validId(studentId)) {
         validId = true;
       } else {
-        throw Exception("A student with that ID number already exists!");
+        throw Exception('A student with that ID number already exists!');
       }
+    }
+
+    bool validName;
+
+    if(await StudentDB().validName(name)){
+      validName = true;
+    }else{
+      throw Exception('A student with this name already exists');
     }
 
     bool validYear;
@@ -29,12 +34,30 @@ class StudentValidator{
     try{
       int value = int.parse(year);
       if(value > 6 || value < 1){
-        throw Exception("You entered an invalid year level. Only input a year from 1 to 6!");
+        throw Exception('You entered an invalid year level. Only input a year from 1 to 6!' );
       }
       validYear = true;
     }catch (e){
-      throw Exception("You entered an invalid year level. Only input a year from 1 to 6!");
+      throw Exception('You entered an invalid year level. Only input a year from 1 to 6!');
     }
+
   }
 
+  Future<bool> checkIfIdIsValid(String id)async{
+    try{
+      if(id.length > 9 || id.isEmpty) return false;
+      bool validId = false;
+      int year = int.parse(id.substring(0, 4));
+      if(year < 1930 && year < 2025) return false;
+      if(id.substring(4,5) == '-') {
+        validId = true;
+      } else{
+        return false;
+      }
+      int.parse(id.substring(5,9));
+      return validId;
+    }catch (e){
+      return false;
+    }
+  }
 }
