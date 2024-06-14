@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'package:new_ssis_2/handlers/searching_handler.dart';
 import '../database/student_db.dart';
 
 class StudentValidator{
@@ -15,11 +14,11 @@ class StudentValidator{
 
     bool validId = false;
     if(studentId != exclude1){
-      if (await checkIfIdIsValid(studentId) && await StudentDB().validId(studentId)) {
-        validId = true;
-      } else {
-        throw Exception('A student with that ID number already exists!');
-      }
+      validId = await checkIfIdIsValid(studentId);
+      if(validId == false) throw Exception('Invalid ID format, use "yyyy-nnnn"');
+
+      validId = await StudentDB().validId(studentId);
+      if(validId == false) throw Exception('A student with that ID number already exists!');
     }
 
     bool validName;
