@@ -130,7 +130,9 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, primaryKey: _selectedId, scope: Scope.student, callback: deleteCallback),
-                        StudentEditButton(studentData: _selectedStudentModel!,callback: editCallback),
+                        StudentEditButton(studentData: _selectedStudentModel!,callback: editCallback, refresh: (){setState(() {
+                          widget.callback();
+                        });},),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )
@@ -149,7 +151,9 @@ class _StudentsWidgetState extends State<StudentsWidget> {
                     child: Row(
                       children: [
                         DeleteButton(index: _selectedIndex, primaryKey: _selectedId, scope: Scope.student, callback: deleteCallback),
-                        StudentEditButton(studentData: _selectedStudentModel!, callback: editCallback),
+                        StudentEditButton(studentData: _selectedStudentModel!, callback: editCallback, refresh: (){setState(() {
+                          widget.callback();
+                        });},),
                         AddButton(callback: addCallback, scope: Scope.student)
                       ],
                     )

@@ -15,7 +15,8 @@ import '../repository/student_repo.dart';
 class StudentEditButton extends StatefulWidget{
   final StudentModel studentData;
   final Function(int, StudentModel) callback;
-  const StudentEditButton({super.key, required this.studentData, required this.callback(int index, StudentModel student)});
+  final VoidCallback refresh;
+  const StudentEditButton({super.key, required this.studentData, required this.callback(int index, StudentModel student), required this.refresh});
 
   @override
   State<StudentEditButton> createState() => _StudentEditButton();
@@ -35,8 +36,8 @@ class _StudentEditButton extends State<StudentEditButton>{
   final sCourseController = TextEditingController();
   final genderController = TextEditingController();
 
-  late String _courseDropdownValue = "Course";
-  late String _genderDropdownValue = "Gender";
+  late String _courseDropdownValue = widget.studentData.course!;
+  late String _genderDropdownValue = widget.studentData.gender;
 
   Scope scope = Scope.student;
 
@@ -53,6 +54,10 @@ class _StudentEditButton extends State<StudentEditButton>{
     print("edit callback");
     index = -1;
     widget.callback(index, StudentModel(id: "", name: "", gender: ""));
+  }
+
+  void refresh(){
+    widget.refresh();
   }
 
   void initControllers()async{
@@ -159,13 +164,21 @@ class _StudentEditButton extends State<StudentEditButton>{
           return const Center(child: Text('No data available'));
         } else {
           List dropdownItems = snapshot.data!;
+
+          courseKeys!.then((courseList){
+            print("Dropdown items: $dropdownItems");
+          });
+
           if (!_courseDropdownValueExistsInItems(dropdownItems)) {
             // If the current selected value is not in the list, set it to the first item
             _courseDropdownValue = dropdownItems[0];
+          }else{
+            _courseDropdownValue = _courseDropdownValue;
           }
 
           return Expanded(
             child: DropdownButton<dynamic>(
+              key: UniqueKey(),
               value: _courseDropdownValue,
               items: dropdownItems.map((dynamic value) {
                 return DropdownMenuItem<String>(
@@ -176,7 +189,15 @@ class _StudentEditButton extends State<StudentEditButton>{
                   ),
                 );
               }).toList(),
-              onChanged: dropdownCallback,
+              onChanged: (dynamic newValue){
+                print("New value selected: $newValue");
+                setState(() {
+                  _courseDropdownValue = newValue;
+                  sCourseController.text = newValue;
+                  print("Updated _courseDropDownValue: $_courseDropdownValue");
+                });
+                refresh();
+              },
             ),
           );
         }
@@ -333,11 +354,10 @@ class _StudentEditButton extends State<StudentEditButton>{
   @override
   Widget build(BuildContext context){
 
+    print("Rebuilding StudentEditButton");
+
     sRepo = StudentRepo();
     courseKeys = CourseDB().fetchAllCourseCodes();
-
-
-
 
     if(widget.studentData.id == ""){
       return const FloatingActionButton(
